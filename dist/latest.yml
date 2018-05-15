@@ -1,0 +1,9 @@
+version: 0.0.0
+files:
+  - url: electron-react-redux-boilerplate-setup-0.0.0.exe
+    sha512: kOCDEKCtUAbKUJcuh0x15Sc9oEdtL03Z5aoANb72H4i1m5s31ojG7KGpEC48KoHk1tJkFflK2tz8lcHL3ncChA==
+    size: 36514542
+path: electron-react-redux-boilerplate-setup-0.0.0.exe
+sha512: kOCDEKCtUAbKUJcuh0x15Sc9oEdtL03Z5aoANb72H4i1m5s31ojG7KGpEC48KoHk1tJkFflK2tz8lcHL3ncChA==
+sha2: 561047ec51c45812ed6f24c91f8c027602463cbeb19896f3757ab4565b6844dd
+releaseDate: '2018-05-15T16:03:41.197Z'
