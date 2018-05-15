@@ -15,3 +15,12 @@ TestTrain is an Integration Test Generator application allowing users to create 
 
 ### Linux
 ```npm run pack:linux```
+
+## Package References
+[Electron Context Menu](https://github.com/sindresorhus/electron-context-menu)
+
+[Electron Debug](https://github.com/sindresorhus/electron-debug)
+
+[Electron Store](https://github.com/sindresorhus/electron-store)
+
+[Electron React Dev Tools](https://github.com/firejune/electron-react-devtools)
