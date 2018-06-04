@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import SplitPane from 'react-split-pane';
 import { Link } from 'react-router-dom';
 import styles from './Home.css';
 
@@ -12,8 +13,14 @@ export default class Home extends Component<Props> {
     return (
       <div>
         <div className={styles.container} data-tid="container">
-          <h2>Home</h2>
-          <Link to="/passgen"> to PassGen</Link>
+          <SplitPane split="vertical" defaultSize="50%">
+            <div>
+              <p>Stuff</p>
+            </div>
+            <div>
+              <p>More Stuff</p>
+            </div>
+          </SplitPane>
         </div>
       </div>
     );
