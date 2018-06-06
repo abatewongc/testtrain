@@ -13,7 +13,7 @@ export default class Home extends Component<Props> {
 		return (
 			<div>
 				<div className={styles.container} data-tid="container">
-					<SplitPane split="vertical" defaultSize={300} minSize={200} maxSize={-500}>
+					<SplitPane split="vertical" defaultSize={200} minSize={50} maxSize={-500}>
 						<div><p>Stuff</p></div>
 						<div><p>More Stuff</p></div>
 					</SplitPane>
