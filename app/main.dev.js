@@ -12,6 +12,10 @@
  */
 import { app, BrowserWindow } from 'electron';
 import MenuBuilder from './menu';
+const path = require('path');
+const fs = require('fs');
+
+const Store = require('electron-store');
 
 let mainWindow = null;
 
@@ -82,6 +86,19 @@ app.on('ready', async () => {
     mainWindow = null;
   });
 
+  const config = new Store();
+  if(!config.has('testcase_datastorage_local')) {
+    config.set('testcase_datastorage_local', path.join(app.getPath('userData'), "\\test_case_data"));
+  }
+
+  let dir = config.get('testcase_datastorage_local');
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+}
+
+  // Start
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
+
+
 });
