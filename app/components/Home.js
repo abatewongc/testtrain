@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import SplitPane from 'react-split-pane';
-import FileTree from 'react-filetree-electron';
+import FileTree from '../components/FileTreeComponent';
 import { Link } from 'react-router-dom';
 import styles from './Home.css';
 

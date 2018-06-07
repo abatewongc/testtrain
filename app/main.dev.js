@@ -93,7 +93,7 @@ app.on('ready', async () => {
 
   let dir = config.get('testcase_datastorage_local');
   if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
+    fs.mkdirSync(path.join(dir, projectname));
 }
 
   // Start
