@@ -1,6 +1,6 @@
 // eslint-disable class-methods-use-this
 import React, { Component } from 'react';
-
+const Store = require('electron-store');
 import FileTree from '../src/filetree/src/filetree-min.js';
 
 import { readFile } from '../utils/file-functions';
@@ -19,6 +19,8 @@ export default class FileSelector extends Component {
     /*eslint-disable react/no-string-refs*/
     this.refs.local.setAttribute('webkitdirectory', true);
     this.refs.local.setAttribute('directory', true);
+    let directory = new Store().get('testcase_datastorage_local');
+    this.setState({ directory })
   }
 
   selectFile(ev) {
@@ -36,7 +38,7 @@ export default class FileSelector extends Component {
   render() {
     return (
       <div>
-        <input id="file-selector" type="file" ref="local" onChange={this.selectFile} />
+        <input className="hidden" id="file-selector" type="file" ref="local" onChange={this.selectFile} />
         {<FileTree
           directory={this.state.directory}
           onFileClick={this.clickTest}

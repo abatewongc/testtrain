@@ -101,3 +101,16 @@ cursor: not-allowed;
 .Resizer.disabled:hover {
 border-color: transparent;
 }
+
+.Pane.vertical.Pane1 {
+  overflow: auto
+}
+
+.hidden {
+  display: none
+}
+
+._fileTree {
+  text-align: left;
+  padding-left: 5px
+}
