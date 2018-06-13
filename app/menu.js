@@ -13,19 +13,21 @@ export default class MenuBuilder {
   }
 
   createProjectModalWindow() {
-    let modalWindow = new BrowserWindow({parent: mainWindow, modal: true, show: false, width: 900, height: 600});
-    modalWindow.loadUrl(`file://${__dirname}/modal-window.html`);
-    modalWindow.webContents.on('did-finish-load', () => {
-      if (!modalWindow) {
-        throw new Error('"modalWindow" is not defined');
-      }
-      modalWindow.show();
-      modalWindow.focus();
-    });
-
-    modalWindow.on('closed', () => {
-      mainWindow = null;
-    });
+    let options = {
+      parent: this.mainWindow,
+      height: 400,
+      width: 600,
+      maxHeight: 400,
+      maxWidth: 600,
+      modal: true,
+      show: false,
+      autoHideMenuBar: true
+    }
+    let child = new BrowserWindow(options);
+    child.loadURL(`file://${__dirname}/create-project-modal-window.html`)
+    child.once('ready-to-show', () => {
+      child.show()
+    })
   }
 
   buildMenu() {

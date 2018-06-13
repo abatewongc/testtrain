@@ -2,10 +2,10 @@
 import React from 'react';
 import { Route } from 'react-router';
 import App from './containers/App';
-import CreateModalWindow from './containers/CreateModalWindow';
+import CreateProjectModalWindow from './containers/CreateProjectModalWindow';
 
 export default () => (
   <App>
-    <Route path="/" component={CreateModalWindow} />
+    <Route path="/" component={CreateProjectModalWindow} />
   </App>
 );

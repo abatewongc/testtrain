@@ -2,17 +2,27 @@ import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import Root from './containers/Root';
+import CreateProjectRoot from './containers/ModalWindowRoot'
 import { configureStore, history } from './store/configureStore';
 import './app.global.css';
 
 const store = configureStore();
 
-render(
-  <AppContainer>
-    <Root store={store} history={history} />
-  </AppContainer>,
-  document.getElementById('root')
-);
+if(document.title == 'Create TestTrain Project') {
+  render(
+    <AppContainer>
+      <CreateProjectRoot store={store} history={history} />
+    </AppContainer>,
+    document.getElementById('root')
+  );
+} else {
+  render(
+    <AppContainer>
+      <Root store={store} history={history} />
+    </AppContainer>,
+    document.getElementById('root')
+  );
+}
 
 if (module.hot) {
   module.hot.accept('./containers/Root', () => {

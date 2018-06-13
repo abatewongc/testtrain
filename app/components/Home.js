@@ -10,6 +10,7 @@ const Store = require('electron-store');
 const store = new Store();
 const directory = store.get('testcase_datastorage_local');
 console.log(directory)
+
 export default class Home extends Component<Props> {
 	props: Props;
 
@@ -19,7 +20,7 @@ export default class Home extends Component<Props> {
 				<div className={styles.container} data-tid="container">
 					<SplitPane split="vertical" defaultSize={200} minSize={50} maxSize={-500}>
 						<div><FileTree directory={directory} /></div>
-						<div><p>More Stuff</p></div>
+						<div></div>
 					</SplitPane>
 				</div>
 			</div>
