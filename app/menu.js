@@ -1,11 +1,33 @@
 // @flow
-import { app, Menu, shell, BrowserWindow } from 'electron';
+const fs = require('fs');
+
+import { app, Menu, shell, BrowserWindow, dialog } from 'electron';
+import React, { Component } from 'react';
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
+  projectDirectory: null;
 
   constructor(mainWindow: BrowserWindow) {
     this.mainWindow = mainWindow;
+  }
+
+  createProjectModalWindow() {
+    let options = {
+      parent: this.mainWindow,
+      height: 400,
+      width: 600,
+      maxHeight: 400,
+      maxWidth: 600,
+      modal: true,
+      show: false,
+      autoHideMenuBar: true
+    }
+    let child = new BrowserWindow(options);
+    child.loadURL(`file://${__dirname}/create-project-modal-window.html`)
+    child.once('ready-to-show', () => {
+      child.show()
+    })
   }
 
   buildMenu() {
@@ -189,16 +211,40 @@ export default class MenuBuilder {
             label: '&New',
             submenu: [
               {
-                label: '&Project'
+                label: '&Project',
+                accelerator: 'Ctrl+Shift+N',
+                click: () => {
+                  this.createProjectModalWindow();
+                  // var options = {
+                  //   title: 'Choose TestTrain Project Directory',
+                  //   properties: ['openDirectory']
+                  // };
+                  // var dirName = dialog.showOpenDialog(this.mainWindow, options, (filePath) => {
+                  //   if(filePath.length > 0) {
+                  //     this.projectDirectory = filePath[0];
+                  //     console.log(this.projectDirectory);
+                  //   }
+                  // });
+                }
               },
               {
-                label: '&Test Case'
+                label: '&Test Case',
+                accelerator: 'Ctrl+N'
               }
             ]
           },
           {
             label: '&Open',
-            accelerator: 'Ctrl+O'
+            accelerator: 'Ctrl+O',
+            click: () => {
+              var options = {
+                title: 'Open TestTrain Project',
+                properties: ['openFile']
+              };
+              var dirName = dialog.showOpenDialog(this.mainWindow, options, (filePath) => {
+                console.log(filePath);
+              });
+            }
           },
           {
             label: '&Close',
@@ -249,37 +295,6 @@ export default class MenuBuilder {
                   }
                 }
               ]
-      },
-      {
-        label: 'Help',
-        submenu: [
-          {
-            label: 'Learn More',
-            click() {
-              shell.openExternal('http://electron.atom.io');
-            }
-          },
-          {
-            label: 'Documentation',
-            click() {
-              shell.openExternal(
-                'https://github.com/atom/electron/tree/master/docs#readme'
-              );
-            }
-          },
-          {
-            label: 'Community Discussions',
-            click() {
-              shell.openExternal('https://discuss.atom.io/c/electron');
-            }
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/atom/electron/issues');
-            }
-          }
-        ]
       }
     ];
 
