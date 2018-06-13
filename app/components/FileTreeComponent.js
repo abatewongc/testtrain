@@ -23,6 +23,7 @@ export default class FileSelector extends Component {
     this.setState({ directory })
   }
 
+
   selectFile(ev) {
     let directory = ev.target.files[0].path;
     if (directory[directory.length - 1] === '/') directory = directory.slice(0, directory.length - 1);

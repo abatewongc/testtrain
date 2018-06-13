@@ -5,6 +5,7 @@ import FileTree from '../components/FileTreeComponent';
 import { Link } from 'react-router-dom';
 import styles from './Home.css';
 
+
 type Props = {};
 const Store = require('electron-store');
 const store = new Store();

@@ -206,6 +206,7 @@
     "history": "^4.7.2",
     "random-words": "^1.1.0",
     "react": "^16.4.0",
+    "react-desktop": "^0.3.5",
     "react-dom": "^16.4.0",
     "react-filetree-electron": "^1.2.2",
     "react-hot-loader": "^4.2.0",

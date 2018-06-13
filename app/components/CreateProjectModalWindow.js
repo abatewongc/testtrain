@@ -3,34 +3,47 @@ import React, { Component } from 'react';
 const {dialog} = require('electron').remote;
 const Store = require('electron-store');
 import styles from './CreateProjectModalWindow.css'
+const path = require('path');
+const remote = require('electron').remote;
 
 export default class CreateProjectModalWindow extends Component {
   constructor() {
     super();
     this.state = {
-      projectName: '',
-			projectDirectory: ''
+			projectName: '',
+			apiURL: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-		this.handleDirectory = this.handleDirectory.bind(this);
   }
 
   handleChange(event) {
-    this.setState({value: event.target.value});
+		switch(event.target.id) {
+			case 'projectName':
+				this.setState({projectName: event.target.value});
+				break;
+			case 'apiURL':
+				this.setState({apiURL: event.target.value})
+				break;
+		}
   }
 
-	handleDirectory(event) {
-		document.getElementById('directoryInput').value = dialog.showOpenDialog({
-			title: 'Select Project Directory',
-			properties: ['openDirectory']
-		})[0];
-	}
-
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.projectName);
-    event.preventDefault();
+		event.preventDefault();
+		console.log('A name was submitted: ' + this.state.projectName);
+		let home_dir = new Store().get('testcase_datastorage_local')
+		let store = new Store({
+			name: this.state.projectName,
+			cwd: path.join(home_dir, "\\", this.state.projectName),
+			fileExtension: "tpf"
+		})
+
+		store.set('apiURL', this.state.apiURL)
+
+
+		let window = remote.getCurrentWindow()
+		window.close()
   }
 
   render() {
@@ -40,14 +53,13 @@ export default class CreateProjectModalWindow extends Component {
 					<label className={styles.label}>
 						Project Name:
 					</label>
-          <input type="text" value={this.state.projectName} onChange={this.handleChange} />
+          <input id='projectName' type="text" value={this.state.projectName} onChange={this.handleChange} />
 				</div>
 				<div className={styles.container}>
 					<label className={styles.label}>
-						Directory:
+						API URL:
 					</label>
-          <input type="text" value={this.state.projectDirectory} onChange={this.handleChange} id="directoryInput"  className={styles.label}/>
-          <button type="button" onClick={this.handleDirectory}> Choose a Directory </button>
+					<input id='apiURL' type="text" value={this.state.apiURL} onChange={this.handleChange} />
 				</div>
 				<div className={styles.submitDiv}>
 					<input type="submit" value="Submit" />
