@@ -11,7 +11,7 @@ export default class CreateProjectModalWindow extends Component {
     super();
     this.state = {
 			projectName: '',
-			apiURL: '',
+			apiURL: ''
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -50,16 +50,12 @@ export default class CreateProjectModalWindow extends Component {
     return (
 			<form onSubmit={this.handleSubmit}>
 				<div className={styles.container}>
-					<label className={styles.label}>
-						Project Name:
-					</label>
-          <input id='projectName' type="text" value={this.state.projectName} onChange={this.handleChange} />
+					<label className={styles.label}>Project Name:</label>
+          <input id="projectName" type="text" value={this.state.projectName} onChange={this.handleChange} />
 				</div>
 				<div className={styles.container}>
-					<label className={styles.label}>
-						API URL:
-					</label>
-					<input id='apiURL' type="text" value={this.state.apiURL} onChange={this.handleChange} />
+					<label className={styles.label}>API URL:</label>
+					<input id="apiURL" type="text" value={this.state.apiURL} onChange={this.handleChange} />
 				</div>
 				<div className={styles.submitDiv}>
 					<input type="submit" value="Submit" />

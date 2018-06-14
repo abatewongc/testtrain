@@ -6,13 +6,42 @@ import React, { Component } from 'react';
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
-  projectDirectory: null;
+  createProject: '';
+  addEndpoint: '';
 
   constructor(mainWindow: BrowserWindow) {
     this.mainWindow = mainWindow;
+    this.createProject = 'project';
+    this.addEndpoint = 'endpoint';
   }
 
-  createProjectModalWindow() {
+  createModalWindow(modalWindowType) {
+    let options = {
+      parent: this.mainWindow,
+      height: 600,
+      width: 800,
+      maxHeight: 600,
+      maxWidth: 800,
+      modal: true,
+      show: false,
+      autoHideMenuBar: true
+    }
+    let child = new BrowserWindow(options);
+    if(modalWindowType === this.createProject) {
+      child.loadURL(`file://${__dirname}/create-project-modal-window.html`);
+    } else if(modalWindowType === this.addEndpoint) {
+      child.loadURL(`file://${__dirname}/add-endpoint-modal-window.html`);
+    } else {
+      alert('Modal Window Type Error: Type is undefined [' + modalWindowType + ']');
+    }
+    if(child) {
+      child.once('ready-to-show', () => {
+        child.show();
+      })
+    }
+  }
+
+  addEndpointModalWindow() {
     let options = {
       parent: this.mainWindow,
       height: 400,
@@ -24,7 +53,6 @@ export default class MenuBuilder {
       autoHideMenuBar: true
     }
     let child = new BrowserWindow(options);
-    child.loadURL(`file://${__dirname}/create-project-modal-window.html`)
     child.once('ready-to-show', () => {
       child.show()
     })
@@ -214,22 +242,15 @@ export default class MenuBuilder {
                 label: '&Project',
                 accelerator: 'Ctrl+Shift+N',
                 click: () => {
-                  this.createProjectModalWindow();
-                  // var options = {
-                  //   title: 'Choose TestTrain Project Directory',
-                  //   properties: ['openDirectory']
-                  // };
-                  // var dirName = dialog.showOpenDialog(this.mainWindow, options, (filePath) => {
-                  //   if(filePath.length > 0) {
-                  //     this.projectDirectory = filePath[0];
-                  //     console.log(this.projectDirectory);
-                  //   }
-                  // });
+                  this.createModalWindow(this.createProject);
                 }
               },
               {
-                label: '&Test Case',
-                accelerator: 'Ctrl+N'
+                label: '&Endpoint',
+                accelerator: 'Ctrl+N',
+                click: () => {
+                  this.createModalWindow(this.addEndpoint);
+                }
               }
             ]
           },
