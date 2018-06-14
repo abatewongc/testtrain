@@ -4,6 +4,11 @@ import SplitPane from 'react-split-pane';
 import FileTree from '../components/FileTreeComponent';
 import { Link } from 'react-router-dom';
 import styles from './Home.css';
+import { Menu, Icon, Switch } from 'antd';
+const SubMenu = Menu.SubMenu;
+
+import TestProjectDisplay from './TestProjectDisplay/TestProjectDisplay'
+import TestProjectViewer from './TestProjectViewer/TestProjectViewer'
 
 type Props = {};
 const Store = require('electron-store');
@@ -18,8 +23,8 @@ export default class Home extends Component<Props> {
 		return (
 			<div>
 				<div className={styles.container} data-tid="container">
-					<SplitPane split="vertical" defaultSize={200} minSize={50} maxSize={-500}>
-						<div><FileTree directory={directory} /></div>
+					<SplitPane split="vertical" defaultSize={250} minSize={250} maxSize={250}>
+						<div><TestProjectDisplay dir={directory}/></div>
 						<div></div>
 					</SplitPane>
 				</div>
