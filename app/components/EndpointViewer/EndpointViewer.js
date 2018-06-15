@@ -1,17 +1,30 @@
 import React, { Component } from 'react';
 import { Divider, Button } from 'antd';
+import { connect } from "react-redux";
+import { loadEndpoint, clearEndpoint } from "../../actions/endpoint-viewer";
 
+const mapStateToProps = state => {
+    return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
+};
 
+const mapDispatchToProps = dispatch => {
+    return {
+      loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
+      clearEndpoint: endpoint => dispatch(clearEndpoint(endpoint)),
+    };
+};
 
-
-
-export default class EndpointViewer extends React.Component {
-    constructor(props) {
-        super(props);
+class ConnectedEndpointViewer extends React.Component {
+    constructor() {
+        super();
 
         this.state = {
-          endpoint: props.endpoint,
+          endpoint: "",
         };
+
+        this.generateClicked = this.generateClicked.bind(this);
+        this.editClicked = this.editClicked.bind(this);
+        this.deleteClicked = this.deleteClicked.bind(this);
       }
 
     generateClicked = (e) => {
@@ -19,19 +32,30 @@ export default class EndpointViewer extends React.Component {
 
     }
     editClicked = (e) => {
-        console.log(e);
-
+        // modified the edit button to display logging for now, specifically the component props and state
+        console.log("logging state");
+        console.log(this.state);
+        console.log("logging props");
+        console.log(this.props);
     }
     deleteClicked = (e) => {
         console.log(e);
-        this.setState({
-            endpoint: emptyEndpoint
-        })
+        e.preventDefault();
+        const endpoint = emptyEndpoint;
+        this.props.clearEndpoint({endpoint});
     }
 
 
     render() {
-        const endpoint = this.state.endpoint;
+        const {endpoint} = this.props;
+        const disabled = (endpoint === undefined || endpoint.disabled); // dunno how to set default props lul
+        if(disabled) {
+          return (
+            <div>
+            <div>You have nothing selected. (mongoloid)</div>
+            </div>
+          )
+        } else {
         return (
             <div style={{paddingLeft: 12, paddingTop: '8px', paddingBottom: 0, textAlign: 'left', overflow: 'auto', height: '100%', lineHeight: 1.1}}>
                 <p className="margin-0" id="endpoint_display_title">{endpoint.path}</p>
@@ -46,11 +70,15 @@ export default class EndpointViewer extends React.Component {
             </div>
         );
     }
+    }
   }
 
   const emptyEndpoint = {
     name: 'null, get a new endpoint',
-    path:'/null/select/or/create/a/new/endpoint',
+    path:'DISABLEDDISABLEDDISABLEDDISABLEDDISABLED',
     end: 'end'
   }
 
+const EndpointViewer = connect(mapStateToProps, mapDispatchToProps)(ConnectedEndpointViewer);
+
+export default EndpointViewer;

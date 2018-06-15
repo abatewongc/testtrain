@@ -12,7 +12,9 @@ export default class TestProjectViewer extends React.Component {
             current_endpoint: {
               name: 'null',
               path: '/null/',
+              disabled: true,
             },
+
             cases: []
         }
     }
@@ -36,5 +38,6 @@ export default class TestProjectViewer extends React.Component {
               </Footer>
             </Layout>
         )
+      }
     }
-}
+
