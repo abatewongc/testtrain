@@ -124,8 +124,10 @@ export default class CreateProjectModalWindow extends Component {
       projects.forEach(function(project) {
         console.log(project);
         if(project.name == projectName) {
+          let fileName = projectName + endpoint.replace(new RegExp('/', 'g'), '-');
           let store = new Store({
-            cwd: path.join(project.path, "\\", endpoint),
+            name: fileName,
+            cwd: path.join(project.path, "\\", fileName),
             fileExtension: "tef"
           });
 
