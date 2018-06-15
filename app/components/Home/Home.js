@@ -24,7 +24,7 @@ export default class Home extends Component<Props> {
 				<div className={styles.container} data-tid="container">
 					<SplitPane split="vertical" defaultSize={250} minSize={250} maxSize={250}>
 						<div><TestProjectDisplay dir={directory}/></div>
-						<div></div>
+						<div><TestProjectViewer/></div>
 					</SplitPane>
 				</div>
 			</div>

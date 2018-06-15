@@ -8,11 +8,11 @@ export default class TestProjectDisplay extends React.Component {
 	constructor() {
 		super();
 		this.state = {
-			theme: 'dark',
+			theme: 'light',
 			current: '1',
 			menuItems: [],
 			openKeys: [],
-			menuRoot: 'hello'
+			menuRoot: ''
 		}
 	}
 
@@ -71,7 +71,7 @@ export default class TestProjectDisplay extends React.Component {
 				<Menu
 					theme={this.state.theme}
 					onClick={this.handleClick}
-					style={{ width: 256 }}
+					style={{ width: 250 }}
 					onOpenChange={this.onOpenChange}
 					selectedKeys={[this.state.current]}
 					openKeys={this.state.openKeys}
