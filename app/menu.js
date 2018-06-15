@@ -20,13 +20,12 @@ export default class MenuBuilder {
       parent: this.mainWindow,
       height: 600,
       width: 800,
-      maxHeight: 600,
-      maxWidth: 800,
       modal: true,
       show: false,
       autoHideMenuBar: true
     }
     let child = new BrowserWindow(options);
+    child.setMenu(null);
     if(modalWindowType === this.createProject) {
       child.loadURL(`file://${__dirname}/create-project-modal-window.html`);
     } else if(modalWindowType === this.addEndpoint) {
@@ -46,8 +45,6 @@ export default class MenuBuilder {
       parent: this.mainWindow,
       height: 400,
       width: 600,
-      maxHeight: 400,
-      maxWidth: 600,
       modal: true,
       show: false,
       autoHideMenuBar: true
@@ -253,19 +250,6 @@ export default class MenuBuilder {
                 }
               }
             ]
-          },
-          {
-            label: '&Open',
-            accelerator: 'Ctrl+O',
-            click: () => {
-              var options = {
-                title: 'Open TestTrain Project',
-                properties: ['openFile']
-              };
-              var dirName = dialog.showOpenDialog(this.mainWindow, options, (filePath) => {
-                console.log(filePath);
-              });
-            }
           },
           {
             label: '&Close',

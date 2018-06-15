@@ -41,7 +41,6 @@ export default class CreateProjectModalWindow extends Component {
 
 		store.set('apiURL', this.state.apiURL)
 
-
 		let window = remote.getCurrentWindow()
 		window.close()
   }

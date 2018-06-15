@@ -1,20 +1,19 @@
 // @flow
 import React, { Component } from 'react';
 import SplitPane from 'react-split-pane';
-import FileTree from '../components/FileTreeComponent';
+import FileTree from '../FileTreeComponent';
 import { Link } from 'react-router-dom';
 import styles from './Home.css';
 import { Menu, Icon, Switch } from 'antd';
 const SubMenu = Menu.SubMenu;
 
-import TestProjectDisplay from './TestProjectDisplay/TestProjectDisplay'
-import TestProjectViewer from './TestProjectViewer/TestProjectViewer'
+import TestProjectDisplay from '../TestProjectDisplay/TestProjectDisplay'
+import TestProjectViewer from '../TestProjectViewer/TestProjectViewer'
 
 type Props = {};
 const Store = require('electron-store');
 const store = new Store();
 const directory = store.get('testcase_datastorage_local');
-console.log(directory)
 
 export default class Home extends Component<Props> {
 	props: Props;

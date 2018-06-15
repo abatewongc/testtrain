@@ -1,8 +1,8 @@
 /* eslint flowtype-errors/show-errors: 0 */
 import React from 'react';
 import { Route } from 'react-router';
-import App from './containers/App';
-import AddEndpointModalWindow from './containers/AddEndpointModalWindow';
+import App from '../containers/App';
+import AddEndpointModalWindow from '../containers/ModalWindow/AddEndpoint/AddEndpointModalWindow';
 
 export default () => (
   <App>

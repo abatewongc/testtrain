@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import AddEndpointModalWindow from '../components/AddEndpointModalWindow';
+import CreateProjectModalWindow from '../../../components/CreateProjectModalWindow/CreateProjectModalWindow';
 
 type Props = {};
 
@@ -8,6 +8,6 @@ export default class HomePage extends Component<Props> {
   props: Props;
 
   render() {
-    return <AddEndpointModalWindow />;
+    return <CreateProjectModalWindow />;
   }
 }

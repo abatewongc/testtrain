@@ -4,14 +4,16 @@ const {dialog} = require('electron').remote;
 const Store = require('electron-store');
 import styles from './AddEndpointModalWindow.css'
 const path = require('path');
+const dirTree = require('directory-tree');
 const remote = require('electron').remote;
 
 export default class CreateProjectModalWindow extends Component {
   constructor() {
     super();
     this.state = {
-      testItems: [{ parameter: '', type: '', testValue: ''}],
 			endpoint: '',
+      project: 'Please Select a Project',
+      testItems: [{ parameter: '', type: '', testValue: ''}],
       successCode: '',
       failCode: ''
     };
@@ -23,6 +25,9 @@ export default class CreateProjectModalWindow extends Component {
     this.handleTestTestValue = this.handleTestTestValue.bind(this);
     this.handleAddTestItem = this.handleAddTestItem.bind(this);
     this.handleRemoveTestItem = this.handleRemoveTestItem.bind(this);
+    this.createSelectItems = this.createSelectItems.bind(this);
+    this.onDropdownSelected = this.onDropdownSelected.bind(this);
+    this.test = this.test.bind(this);
   }
 
   handleChange(event) {
@@ -87,7 +92,57 @@ export default class CreateProjectModalWindow extends Component {
     });
   }
 
+  createSelectItems() {
+    let items = [];
+    let projects = dirTree(new Store().get('testcase_datastorage_local'), {extensions:/\.tpf$/}).children;
+    items.push(<option key="0" value="Please Select a Project">Please Select a Project</option>);
+    for(let i = 0; i < projects.length; i++) {
+      let projectName = projects[i].name;
+      let index = i + 1;
+      items.push(<option key={index} value={projectName}>{projectName}</option>);
+    }
+    return items;
+  }
+
+  onDropdownSelected(event) {
+    this.setState({project: event.target.value});
+  }
+
   handleSubmit(event) {
+    event.preventDefault();
+
+    let projectName = this.state.project;
+    let endpoint = this.state.endpoint;
+    let testItems = this.state.testItems;
+    let successCode = this.state.successCode;
+    let failCode = this.state.failCode;
+
+    if(projectName == 'Please Select a Project') {
+      alert('Please Select a Project');
+    } else {
+      let projects = dirTree(new Store().get('testcase_datastorage_local'), {extensions:/\.tpf$/}).children;
+      projects.forEach(function(project) {
+        console.log(project);
+        if(project.name == projectName) {
+          let store = new Store({
+            cwd: path.join(project.path, "\\", endpoint),
+            fileExtension: "tef"
+          });
+
+          store.set('testItems', testItems);
+          store.set('successCode', successCode);
+          store.set('failCode', failCode);
+
+          let window = remote.getCurrentWindow();
+          window.close();
+        }
+      })
+    }
+  }
+
+  test() {
+    let projects = dirTree(new Store().get('testcase_datastorage_local'), {extensions:/\.tpf$/}).children;
+    console.log(projects);
   }
 
   render() {
@@ -97,6 +152,12 @@ export default class CreateProjectModalWindow extends Component {
           <label className={styles.label}>Endpoint: </label>
           <input id="endpoint" type="text" value={this.state.endpoint} onChange={this.handleChange} size="8"/>
           <button type="button" onClick={this.handleAddTestItem} className="small" className={styles.button}>Add Parameter</button>
+        </div>
+        <div className={styles.container}>
+          <label className={styles.label}>Project: </label>
+          <select value={this.state.project} onChange={this.onDropdownSelected}>
+            {this.createSelectItems()}
+          </select>
         </div>
         {this.state.testItems.map((testItem, idx) => (
           <div className={styles.container}>
@@ -127,6 +188,9 @@ export default class CreateProjectModalWindow extends Component {
         </div>
         <div className={styles.container}>
           <input type="submit" onClick={this.handleSubmit} className={styles.button} />
+        </div>
+        <div className={styles.container}>
+          <button type="button" onClick={this.test} className={styles.button}>Test</button>
         </div>
 			</form>
     );

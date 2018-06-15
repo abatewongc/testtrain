@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
-import Routes from '../add-endpoint-modal-window-route.js';
+import Routes from '../../../routes/create-project-modal-window-route.js';
 
 type Props = {
   store: {},
