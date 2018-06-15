@@ -3,8 +3,20 @@ import { Menu, Icon, Switch } from 'antd';
 import MenuItem from 'antd/lib/menu/MenuItem';
 const dirTree = require('directory-tree');
 const SubMenu = Menu.SubMenu;
+import { connect } from "react-redux";
+import { loadEndpoint } from "../../actions/endpoint-viewer";
 
-export default class TestProjectDisplay extends React.Component {
+const mapStateToProps = state => {
+    return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+      loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
+    };
+};
+
+class ConnectedTestProjectDisplay extends React.Component {
 	constructor() {
 		super();
 		this.state = {
@@ -36,7 +48,12 @@ export default class TestProjectDisplay extends React.Component {
 			current: e.key,
 		});
 		if(!e.keyPath[0].endsWith(".tpf")) {
-
+			const endpoint = {
+				name: 'null, get a new endpoint', // TODO: GET PROJECT DATA FROM .TEF FILE
+				path: e.keyPath[0],
+				disabled: false,
+			}
+			this.props.loadEndpoint({endpoint});
 		}
 	}
 
@@ -92,3 +109,7 @@ const ProjectMenuItem = (props) =>
 		props.data.children.map(ep => <Menu.Item data={ep} key={ep.name}>{ep.name}</Menu.Item>)
 	}
 	</SubMenu>
+
+const TestProjectDisplay = connect(mapStateToProps, mapDispatchToProps)(ConnectedTestProjectDisplay);
+
+export default TestProjectDisplay;
