@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Divider, Button } from 'antd';
 import { connect } from "react-redux";
 import { loadEndpoint, clearEndpoint } from "../../actions/endpoint-viewer";
+import styles from './EndpointViewer.css'
 
 const mapStateToProps = state => {
     return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
@@ -57,16 +58,16 @@ class ConnectedEndpointViewer extends React.Component {
           )
         } else {
         return (
-            <div style={{paddingLeft: 12, paddingTop: '8px', paddingBottom: 0, textAlign: 'left', overflow: 'auto', height: '100%', lineHeight: 1.1}}>
-                <p className="margin-0" id="endpoint_display_title">{endpoint.path}</p>
-                <p className="margin-0"id="endpoint_display_path" >
-                    <Divider type="vertical" />
+            <div style={{paddingLeft: 12, paddingTop: '8px', paddingBottom: '0px', textAlign: 'left', overflow: 'auto', height: '100%', lineHeight: 1.1}}>
+                <p className="margin-0" id="endpoint_display_title">{endpoint.name}</p>
+                <div className={styles.buttonMenu} id="endpoint_display_path" >
+                  <Divider type="vertical" />
                     <Button type="primary" size="small" onClick={this.generateClicked}>Generate</Button>
                     <Divider type="vertical" />
                     <Button size="small" onClick={this.editClicked}>Edit</Button>
                     <Divider type="vertical" />
                     <Button size="small" onClick={this.deleteClicked}>Delete</Button>
-                </p>
+                </div>
             </div>
         );
     }

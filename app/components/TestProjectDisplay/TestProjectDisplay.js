@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { Menu, Icon, Switch } from 'antd';
 import MenuItem from 'antd/lib/menu/MenuItem';
+const Store = require('electron-store');
 const dirTree = require('directory-tree');
+const path = require('path');
+const fs = require('fs');
 const SubMenu = Menu.SubMenu;
 import { connect } from "react-redux";
 import { loadEndpoint } from "../../actions/endpoint-viewer";
@@ -26,6 +29,8 @@ class ConnectedTestProjectDisplay extends React.Component {
 			openKeys: [],
 			menuRoot: ''
 		}
+
+    this.getProjectPath = this.getProjectPath.bind(this);
 	}
 
 	componentDidMount() {
@@ -42,18 +47,31 @@ class ConnectedTestProjectDisplay extends React.Component {
 		});
 	}
 
+  getProjectPath = (key) => {
+    for(let i = 0; i < this.state.menuItems.length; i++) {
+      let project = this.state.menuItems[i];
+      for(let j = 0; j < project.children.length; j++) {
+        let child = project.children[j];
+        if(child.name == key) {
+          return JSON.parse(fs.readFileSync(path.join(project.path, key, key + '.tef'), 'utf8'));
+        }
+      }
+    }
+  }
+
 	handleClick = (e) => {
-		console.log('click beep', e);
 		this.setState({
 			current: e.key,
 		});
 		if(!e.keyPath[0].endsWith(".tpf")) {
-			const endpoint = {
-				name: 'null, get a new endpoint', // TODO: GET PROJECT DATA FROM .TEF FILE
-				path: e.keyPath[0],
-				disabled: false,
-			}
-			this.props.loadEndpoint({endpoint});
+      let data = this.getProjectPath(e.key);
+      const endpoint = {
+          name: e.key,
+          data: data,
+          disabled: false
+      }
+      this.props.loadEndpoint({endpoint});
+      this.forceUpdate();
 		}
 	}
 

@@ -8,7 +8,7 @@ const initialState = {
 const emptyState = {
     current_endpoint: {
         name: 'DISABLED',
-        path: 'DISABLED',
+        data: {},
         disabled: true,
     }
 }
