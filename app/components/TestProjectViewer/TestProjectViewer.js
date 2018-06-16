@@ -5,8 +5,14 @@ const { Header, Content, Footer, Sider } = Layout;
 import EndpointViewer from '../EndpointViewer/EndpointViewer'
 import { Z_FIXED } from 'zlib';
 import { inherits } from 'util';
-import { loadEndpoint, clearEndpoint } from "../../actions/endpoint-viewer";
-import styles from './TestProjectViewer.css'
+import { loadEndpoint, editEndpoint } from "../../actions/endpoint-viewer";
+import styles from './TestProjectViewer.css';
+import { Collapse } from 'antd';
+const Panel = Collapse.Panel;
+import paths from 'path'
+const Store = require('electron-store');
+
+import Testcase from '../Testcase/Testcase'
 
 const mapStateToProps = state => {
     return {
@@ -38,10 +44,15 @@ class ConnectedTestProjectViewer extends React.Component {
       theme: 'light'
     }
 
+		this.extractTestcasesFromTEF = this.extractTestcasesFromTEF.bind(this);
+    this.renderContent = this.renderContent.bind(this);
+    this.renderEndpoint = this.renderEndpoint.bind(this);
 		this.renderEndpointData = this.renderEndpointData.bind(this);
+    this.renderTestCases = this.renderTestCases.bind(this);
     this.handleParameterChange = this.handleParameterChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+		this.createTestCaseObject = this.createTestCaseObject.bind(this);
   }
 
   handleParameterChange = (parameterName, target) => (event) => {
@@ -54,14 +65,102 @@ class ConnectedTestProjectViewer extends React.Component {
     this.forceUpdate();
   }
 
+	 createTestCaseObject(endpoint) {
+  		// ************************************************************** */
+  		// THIS IS WHERE WE WOULD GET THE DATA FROM THE TEF
+  		// ANY HARDCODED DATA IN THIS METHOD WOULD BE EXTRACTED IN THIS BLOCK
+  		let _name = 'experimental'
+  		// ************************************************************** */
+  		let testcase = {
+			name: _name,
+			fullurl: paths.join(endpoint.name.replace(new RegExp('&', 'g'), '/'), '/', _name),
+			success: endpoint.data.successCode,
+			fail: endpoint.data.failCode,
+			successoutput: [
+				{
+					text: "experimental_success"
+					// other stuff?
+				}
+			],
+			failoutput:[
+				{
+					text: "experimental_failure"
+					// other this?
+				}
+			],
+			input: [
+				{
+					parameter: "1",
+					type: "string",
+					value: "hi",
+				},
+				{
+					parameter: "2",
+					type: "integer",
+					value: "2",
+				},{
+					parameter: "3",
+					type: "boolean",
+					value: "0",
+				}
+			]
+
+		}
+
+		return testcase;
+	}
+
+	extractTestcasesFromTEF(endpoint) {
+		let testcase1 = this.createTestCaseObject(endpoint);
+		let testcase2 = this.createTestCaseObject(endpoint);
+		let testcase3 = this.createTestCaseObject(endpoint);
+		let testcase4 = this.createTestCaseObject(endpoint);
+		let testcase5 = this.createTestCaseObject(endpoint);
+
+		return [ testcase1, testcase2, testcase3, testcase4, testcase5 ];
+	}
+
   handleChange = (target) => (event) => {
     this.state.current_endpoint.data[target] = event.target.value;
-    console.log(this.state.current_endpoint);
     this.forceUpdate();
   }
 
   handleSubmit() {
+    let endpointName = this.state.current_endpoint.name;
+    let tefPath = this.state.current_endpoint.tefPath;
+    let tefData = this.state.current_endpoint.data;
+    let testItems = tefData.testItems;
+    let successCode = tefData.successCode;
+    let failCode = tefData.failCode;
 
+    let tefFile = '\\' + endpointName + '.tef';
+    let tefIndex = tefPath.indexOf(tefFile);
+    let tefDirPath = tefPath.substring(0, tefIndex);
+
+    let store = new Store({
+      name: endpointName,
+      cwd: tefDirPath,
+      fileExtension: "tef"
+    });
+
+    store.set('testItems', testItems);
+    store.set('successCode', successCode);
+    store.set('failCode', failCode);
+
+    this.props.editEndpoint(false);
+    this.forceUpdate();
+  }
+
+  renderContent() {
+    if(this.state.current_endpoint) {
+      return <Collapse>{this.renderEndpoint()}{this.renderTestCases()}</Collapse>
+    }
+  }
+
+  renderEndpoint() {
+    if(this.state.current_endpoint) {
+      return <Panel header="Endpoint Information">{this.renderEndpointData()}</Panel>
+    }
   }
 
 	renderEndpointData() {
@@ -122,11 +221,7 @@ class ConnectedTestProjectViewer extends React.Component {
           <div className={styles.container}>
             <label className={styles.label}>Response Fail Code: </label>
             <input id={'failCode'} value={endpointFailCode} className={styles.inputBox} onChange={handleChange('failCode')} />
-          </div>
-        )
-        endpointInformation.push(
-          <div className={styles.container}>
-            <button type="button" className={styles.submit}>Submit</button>
+              <button type="button" className={styles.submit} onClick={this.handleSubmit}>Submit</button>
           </div>
         )
       } else {
@@ -147,6 +242,15 @@ class ConnectedTestProjectViewer extends React.Component {
 		}
 	}
 
+  renderTestCases() {
+    if(this.state.current_endpoint) {
+      let testcases = this.extractTestcasesFromTEF(this.state.current_endpoint);
+      if(testcases) {
+        return testcases.map((tc, index) => (<Testcase testcase={tc} key={tc.name.concat('_testcase_').concat(index)} />))
+      }
+    }
+  }
+
 	render() {
     this.state.current_endpoint = this.props.endpoint;
     this.state.edit = this.props.edit;
@@ -157,7 +261,7 @@ class ConnectedTestProjectViewer extends React.Component {
 	      </Header>
 	      <Content style={{ margin: '24px 16px 0', overflow: 'auto', height: '95%' }}>
 	        <div style={{ padding: 24, background: '#fff', height: '100%', overflow: 'scroll'}}>
-						{this.renderEndpointData()}
+            {this.renderContent()}
 					</div>
 	      </Content>
 	      <Footer style={{ textAlign: 'center', height: '24px', zIndex: 1 }}>
