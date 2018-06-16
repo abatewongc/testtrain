@@ -10,7 +10,9 @@ import { connect } from "react-redux";
 import { loadEndpoint } from "../../actions/endpoint-viewer";
 
 const mapStateToProps = state => {
-	return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
+	return {
+		endpoint: state.current_endpoint_reducer.current_endpoint.endpoint
+	};
 };
 
 const mapDispatchToProps = dispatch => {
@@ -54,31 +56,40 @@ class ConnectedTestProjectDisplay extends React.Component {
 		});
 	}
 
-getProjectPath = (key) => {
-	for(let i = 0; i < this.state.menuItems.length; i++) {
-		let project = this.state.menuItems[i];
-		for(let j = 0; j < project.children.length; j++) {
-			let child = project.children[j];
-			if(child.name == key) {
-				return JSON.parse(fs.readFileSync(path.join(project.path, key, key + '.tef'), 'utf8'));
-			}
-		}
-	}
-}
+  getProjectPath = (key) => {
+    for(let i = 0; i < this.state.menuItems.length; i++) {
+      let project = this.state.menuItems[i];
+      for(let j = 0; j < project.children.length; j++) {
+        let child = project.children[j];
+        if(child.name == key) {
+          let projectName = project.name;
+          let tefPath = path.join(project.path, key, key + '.tef');
+          let data = JSON.parse(fs.readFileSync(tefPath, 'utf8'));
+          return {
+            projectName: projectName,
+            data: data,
+            tefPath: tefPath
+          }
+        }
+      }
+    }
+  }
 
 	handleClick = (e) => {
 		this.setState({
 			current: e.key,
 		});
 		if(!e.keyPath[0].endsWith(".tpf")) {
-			let data = this.getProjectPath(e.key);
-			const endpoint = {
-				name: e.key,
-				data: data,
-				disabled: false
-			}
-			this.props.loadEndpoint({endpoint});
-			this.forceUpdate();
+      let endpointData = this.getProjectPath(e.key);
+      const endpoint = {
+          name: e.key,
+          projectName: endpointData.projectName,
+          data: endpointData.data,
+          tefPath: endpointData.tefPath,
+          disabled: false
+      }
+      this.props.loadEndpoint({endpoint});
+      this.forceUpdate();
 		}
 	}
 
