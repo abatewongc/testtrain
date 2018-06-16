@@ -34,10 +34,17 @@ class ConnectedTestProjectDisplay extends React.Component {
 	}
 
 	componentDidMount() {
-		setInterval(() => {
-			let menuItems = dirTree(this.props.dir, {extensions:/\.tpf$/}).children;
+		console.log(this.props.dir);
+		if(this.state.refreshid) {
+			clearInterval(refreshid);
+		}
+		let _refreshid = setInterval(() => {
+			let menuItems = dirTree(this.props.dir, {extensions:/\.txt/}).children; // this extension is a FUCKING INCLUDE, NOT AN EXCLUDE
 			this.setState({menuItems});
 		}, 500);
+		this.setState({
+			refreshid: _refreshid,
+		})
 	}
 
 
