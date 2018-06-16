@@ -8,8 +8,10 @@ const initialState = {
 const emptyState = {
     current_endpoint: {
         name: 'DISABLED',
+        projectName: '',
         data: {},
-        disabled: true,
+        tefPath: '',
+        disabled: true
     }
 }
 

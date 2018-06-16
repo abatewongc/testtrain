@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Divider, Button } from 'antd';
 import { connect } from "react-redux";
 import { loadEndpoint, clearEndpoint } from "../../actions/endpoint-viewer";
+import MenuBuilder from '../../menu.js';
 import styles from './EndpointViewer.css'
 
 const mapStateToProps = state => {

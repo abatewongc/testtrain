@@ -15,7 +15,7 @@ export default class MenuBuilder {
     this.addEndpoint = 'endpoint';
   }
 
-  createModalWindow(modalWindowType) {
+  createModalWindow(modalWindowType, extraData) {
     let options = {
       parent: this.mainWindow,
       height: 600,

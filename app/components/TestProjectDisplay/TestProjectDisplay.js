@@ -53,7 +53,14 @@ class ConnectedTestProjectDisplay extends React.Component {
       for(let j = 0; j < project.children.length; j++) {
         let child = project.children[j];
         if(child.name == key) {
-          return JSON.parse(fs.readFileSync(path.join(project.path, key, key + '.tef'), 'utf8'));
+          let projectName = project.name;
+          let tefPath = path.join(project.path, key, key + '.tef');
+          let data = JSON.parse(fs.readFileSync(tefPath, 'utf8'));
+          return {
+            projectName: projectName,
+            data: data,
+            tefPath: tefPath
+          }
         }
       }
     }
@@ -64,10 +71,12 @@ class ConnectedTestProjectDisplay extends React.Component {
 			current: e.key,
 		});
 		if(!e.keyPath[0].endsWith(".tpf")) {
-      let data = this.getProjectPath(e.key);
+      let endpointData = this.getProjectPath(e.key);
       const endpoint = {
           name: e.key,
-          data: data,
+          projectName: endpointData.projectName,
+          data: endpointData.data,
+          tefPath: endpointData.tefPath,
           disabled: false
       }
       this.props.loadEndpoint({endpoint});

@@ -6,6 +6,7 @@ import EndpointViewer from '../EndpointViewer/EndpointViewer'
 import { Z_FIXED } from 'zlib';
 import { inherits } from 'util';
 import { loadEndpoint, clearEndpoint } from "../../actions/endpoint-viewer";
+import styles from './TestProjectViewer.css'
 
 const mapStateToProps = state => {
     return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
@@ -24,10 +25,13 @@ class ConnectedTestProjectViewer extends React.Component {
 		this.state = {
 	    current_endpoint: {
 	      name: '',
+        projectName: '',
 	      data: {},
+        tefPath: '',
 	      disabled: true,
 	    },
-	    cases: []
+	    cases: [],
+      theme: 'light'
     }
 
 		this.renderEndpointData = this.renderEndpointData.bind(this);
@@ -35,13 +39,51 @@ class ConnectedTestProjectViewer extends React.Component {
 
 	renderEndpointData(endpoint) {
 		if(endpoint) {
-			return <p>{JSON.stringify(endpoint.data)}</p>
+      let endpointInformation = [];
+      let parameters = endpoint.data.testItems;
+      let endpointName = endpoint.name;
+      let endpointSuccessCode = endpoint.data.successCode;
+      let endpointFailCode = endpoint.data.failCode;
+      if(parameters && parameters.length > 0) {
+        parameters.forEach(function(parameter) {
+          let parameterName = parameter.parameter;
+          let parameterType = parameter.type;
+          let testValue = parameter.testValue;
+          endpointInformation.push(
+            <div className={styles.container}>
+              <label className={styles.label}>Parameter: </label>
+              <input id={endpointName + '_' + parameterName} value={parameterName} className={styles.inputBox} disabled/>
+              <label className={styles.label}>Type: </label>
+              <input id={endpointName + '_' + parameterName + '_' + parameterType} className={styles.inputBox} disabled/>
+              <label className={styles.label}>Test Value: </label>
+              <input id={endpointName +'_' + parameterName + '-' + testValue} className={styles.inputBox} disabled/>
+            </div>
+          )
+        })
+      } else {
+        endpointInformation.push(
+          <div className={styles.container}>
+            <label className={styles.label}>This endpoint has no parameters</label>
+          </div>
+        )
+      }
+      endpointInformation.push(
+        <div className={styles.container}>
+          <label className={styles.label}>Response Success Code: </label>
+          <input id={endpointName + '_' + 'successCode'} value={endpointSuccessCode} className={styles.inputBox} disabled/>
+        </div>
+      )
+      endpointInformation.push(
+        <div className={styles.container}>
+          <label className={styles.label}>Response Fail Code: </label>
+          <input id={endpointName + '_' + 'failCode'} value={endpointFailCode} className={styles.inputBox} disabled/>
+        </div>
+      )
+      return endpointInformation;
 		}
 	}
 
 	render() {
-		console.log(this.props.endpoint);
-
 		return (
 	    <Layout style={{ marginLeft: 0 , height: '100vh'}}>
 	      <Header style={{ background: '#F1F2F6', padding: 0, Position: 'fixed', zIndex: 1, height: '64px', overflow: 'hidden'}}>
