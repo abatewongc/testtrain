@@ -10,13 +10,13 @@ import { connect } from "react-redux";
 import { loadEndpoint } from "../../actions/endpoint-viewer";
 
 const mapStateToProps = state => {
-    return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
+	return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
 };
 
 const mapDispatchToProps = dispatch => {
-    return {
-      loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
-    };
+	return {
+		loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
+	};
 };
 
 class ConnectedTestProjectDisplay extends React.Component {
@@ -30,14 +30,21 @@ class ConnectedTestProjectDisplay extends React.Component {
 			menuRoot: ''
 		}
 
-    this.getProjectPath = this.getProjectPath.bind(this);
+	this.getProjectPath = this.getProjectPath.bind(this);
 	}
 
 	componentDidMount() {
-		setInterval(() => {
-			let menuItems = dirTree(this.props.dir, {extensions:/\.tpf$/}).children;
+		console.log(this.props.dir);
+		if(this.state.refreshid) {
+			clearInterval(refreshid);
+		}
+		let _refreshid = setInterval(() => {
+			let menuItems = dirTree(this.props.dir, {extensions:/\.txt/}).children; // this extension is a FUCKING INCLUDE, NOT AN EXCLUDE
 			this.setState({menuItems});
 		}, 500);
+		this.setState({
+			refreshid: _refreshid,
+		})
 	}
 
 
@@ -133,7 +140,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 const ProjectMenuItem = (props) =>
 	<SubMenu {...props} data={props.data} key={props.data.path} title={<span><Icon type="folder" /><span>{props.data.name}</span></span>}>
 	{
-		props.data.children.map(ep => <Menu.Item data={ep} key={ep.name}>{ep.name}</Menu.Item>)
+		props.data.children.map(ep => <Menu.Item data={ep} key={ep.name}>{ep.name.replace(new RegExp('&', 'g'), '/')}</Menu.Item>)
 	}
 	</SubMenu>
 

@@ -27,6 +27,7 @@ class ConnectedEndpointViewer extends React.Component {
         this.generateClicked = this.generateClicked.bind(this);
         this.editClicked = this.editClicked.bind(this);
         this.deleteClicked = this.deleteClicked.bind(this);
+        this.uploadClicked = this.uploadClicked.bind(this);
       }
 
     generateClicked = (e) => {
@@ -46,6 +47,9 @@ class ConnectedEndpointViewer extends React.Component {
         const endpoint = emptyEndpoint;
         this.props.clearEndpoint({endpoint});
     }
+    uploadClicked = (e) => {
+        console.log(e);
+    }
 
 
     render() {
@@ -59,8 +63,8 @@ class ConnectedEndpointViewer extends React.Component {
           )
         } else {
         return (
-            <div style={{paddingLeft: 12, paddingTop: '8px', paddingBottom: '0px', textAlign: 'left', overflow: 'auto', height: '100%', lineHeight: 1.1}}>
-                <p className="margin-0" id="endpoint_display_title">{endpoint.name}</p>
+            <div style={{paddingLeft: 12, paddingTop: '4px', paddingBottom: '0px', textAlign: 'left', overflow: 'auto', height: '100%', lineHeight: 1.1}}>
+                <p className="margin-0" id="endpoint_display_title">{endpoint.name.replace(new RegExp('&', 'g'), '/')}</p>
                 <div className={styles.buttonMenu} id="endpoint_display_path" >
                   <Divider type="vertical" />
                     <Button type="primary" size="small" onClick={this.generateClicked}>Generate</Button>
@@ -68,6 +72,8 @@ class ConnectedEndpointViewer extends React.Component {
                     <Button size="small" onClick={this.editClicked}>Edit</Button>
                     <Divider type="vertical" />
                     <Button size="small" onClick={this.deleteClicked}>Delete</Button>
+                    <Divider type="vertical" />
+                    <Button size="small" onClick={this.uploadClicked}>Upload</Button>
                 </div>
             </div>
         );

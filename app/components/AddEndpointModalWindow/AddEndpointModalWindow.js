@@ -123,7 +123,7 @@ export default class CreateProjectModalWindow extends Component {
       let projects = dirTree(new Store().get('testcase_datastorage_local'), {extensions:/\.tpf$/}).children;
       projects.forEach(function(project) {
         if(project.name == projectName) {
-          let fileName = endpoint.replace(new RegExp('/', 'g'), '-');
+          let fileName = endpoint.replace(new RegExp('/', 'g'), '&');
           let store = new Store({
             name: fileName,
             cwd: path.join(project.path, "\\", fileName),
