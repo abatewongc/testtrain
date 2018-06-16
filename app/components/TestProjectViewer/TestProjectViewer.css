@@ -11,3 +11,8 @@
 .inputBox {
   width: 15%;
 }
+
+.submit {
+  float: right;
+  margin: 6px 6px 6px 6px;
+}

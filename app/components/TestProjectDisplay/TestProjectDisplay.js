@@ -10,7 +10,9 @@ import { connect } from "react-redux";
 import { loadEndpoint } from "../../actions/endpoint-viewer";
 
 const mapStateToProps = state => {
-	return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
+	return {
+		endpoint: state.current_endpoint_reducer.current_endpoint.endpoint
+	};
 };
 
 const mapDispatchToProps = dispatch => {

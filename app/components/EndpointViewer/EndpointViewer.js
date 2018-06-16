@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
 import { Divider, Button } from 'antd';
 import { connect } from "react-redux";
-import { loadEndpoint, clearEndpoint } from "../../actions/endpoint-viewer";
+import { loadEndpoint, clearEndpoint, editEndpoint } from "../../actions/endpoint-viewer";
 import MenuBuilder from '../../menu.js';
 import styles from './EndpointViewer.css'
 
 const mapStateToProps = state => {
-    return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
+    return {
+      endpoint: state.current_endpoint_reducer.current_endpoint.endpoint,
+      edit: state.current_endpoint_reducer.edit_endpoint
+    };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
       loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
       clearEndpoint: endpoint => dispatch(clearEndpoint(endpoint)),
+      editEndpoint: edit => dispatch(editEndpoint(edit))
     };
 };
 
@@ -35,11 +39,11 @@ class ConnectedEndpointViewer extends React.Component {
 
     }
     editClicked = (e) => {
-        // modified the edit button to display logging for now, specifically the component props and state
-        console.log("logging state");
-        console.log(this.state);
-        console.log("logging props");
-        console.log(this.props);
+        if(this.props.edit) {
+          this.props.editEndpoint(false);
+        } else {
+          this.props.editEndpoint(true);
+        }
     }
     deleteClicked = (e) => {
         console.log(e);
