@@ -10,13 +10,13 @@ import { connect } from "react-redux";
 import { loadEndpoint } from "../../actions/endpoint-viewer";
 
 const mapStateToProps = state => {
-    return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
+	return { endpoint: state.current_endpoint_reducer.current_endpoint.endpoint };
 };
 
 const mapDispatchToProps = dispatch => {
-    return {
-      loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
-    };
+	return {
+		loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
+	};
 };
 
 class ConnectedTestProjectDisplay extends React.Component {
@@ -30,7 +30,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 			menuRoot: ''
 		}
 
-    this.getProjectPath = this.getProjectPath.bind(this);
+	this.getProjectPath = this.getProjectPath.bind(this);
 	}
 
 	componentDidMount() {
@@ -54,31 +54,31 @@ class ConnectedTestProjectDisplay extends React.Component {
 		});
 	}
 
-  getProjectPath = (key) => {
-    for(let i = 0; i < this.state.menuItems.length; i++) {
-      let project = this.state.menuItems[i];
-      for(let j = 0; j < project.children.length; j++) {
-        let child = project.children[j];
-        if(child.name == key) {
-          return JSON.parse(fs.readFileSync(path.join(project.path, key, key + '.tef'), 'utf8'));
-        }
-      }
-    }
-  }
+getProjectPath = (key) => {
+	for(let i = 0; i < this.state.menuItems.length; i++) {
+		let project = this.state.menuItems[i];
+		for(let j = 0; j < project.children.length; j++) {
+			let child = project.children[j];
+			if(child.name == key) {
+				return JSON.parse(fs.readFileSync(path.join(project.path, key, key + '.tef'), 'utf8'));
+			}
+		}
+	}
+}
 
 	handleClick = (e) => {
 		this.setState({
 			current: e.key,
 		});
 		if(!e.keyPath[0].endsWith(".tpf")) {
-      let data = this.getProjectPath(e.key);
-      const endpoint = {
-          name: e.key,
-          data: data,
-          disabled: false
-      }
-      this.props.loadEndpoint({endpoint});
-      this.forceUpdate();
+			let data = this.getProjectPath(e.key);
+			const endpoint = {
+				name: e.key,
+				data: data,
+				disabled: false
+			}
+			this.props.loadEndpoint({endpoint});
+			this.forceUpdate();
 		}
 	}
 
@@ -131,7 +131,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 const ProjectMenuItem = (props) =>
 	<SubMenu {...props} data={props.data} key={props.data.path} title={<span><Icon type="folder" /><span>{props.data.name}</span></span>}>
 	{
-		props.data.children.map(ep => <Menu.Item data={ep} key={ep.name}>{ep.name}</Menu.Item>)
+		props.data.children.map(ep => <Menu.Item data={ep} key={ep.name}>{ep.name.replace(new RegExp('&', 'g'), '/')}</Menu.Item>)
 	}
 	</SubMenu>
 

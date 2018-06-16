@@ -63,7 +63,7 @@ class ConnectedEndpointViewer extends React.Component {
         } else {
         return (
             <div style={{paddingLeft: 12, paddingTop: '4px', paddingBottom: '0px', textAlign: 'left', overflow: 'auto', height: '100%', lineHeight: 1.1}}>
-                <p className="margin-0" id="endpoint_display_title">{endpoint.name}</p>
+                <p className="margin-0" id="endpoint_display_title">{endpoint.name.replace(new RegExp('&', 'g'), '/')}</p>
                 <div className={styles.buttonMenu} id="endpoint_display_path" >
                   <Divider type="vertical" />
                     <Button type="primary" size="small" onClick={this.generateClicked}>Generate</Button>
