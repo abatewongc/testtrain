@@ -1,0 +1,29 @@
+.col_half {
+  width: 50%;
+  float: left;
+}
+
+.col_fourth {
+  width: 25%;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  float: left;
+}
+
+.label {
+  margin-right: 6px;
+}
+
+.container {
+  margin: 6px 6px 6px 6px;
+}
+
+.button {
+  float: right;
+  margin-right: 6px;
+}
+
+.col {
+  width: 33%;
+  margin: 6px 6px 6px 6px;
+}
