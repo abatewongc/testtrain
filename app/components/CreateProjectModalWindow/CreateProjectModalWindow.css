@@ -1,12 +1,4 @@
-.label {
-  margin-right: 6px;
-}
-
-.container {
-  margin: 6px 6px 6px 6px;
-}
-
-.submitDiv {
+.button {
   float: right;
   margin-right: 6px;
 }

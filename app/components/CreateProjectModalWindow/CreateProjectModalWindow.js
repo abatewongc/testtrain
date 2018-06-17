@@ -1,10 +1,12 @@
 // eslint-disable class-methods-use-this
 import React, { Component } from 'react';
+import { Form, Row, Input, Button, Col } from 'antd';
+import styles from './CreateProjectModalWindow.css'
 const {dialog} = require('electron').remote;
 const Store = require('electron-store');
-import styles from './CreateProjectModalWindow.css'
 const path = require('path');
 const remote = require('electron').remote;
+const FormItem = Form.Item;
 
 export default class CreateProjectModalWindow extends Component {
   constructor() {
@@ -46,20 +48,33 @@ export default class CreateProjectModalWindow extends Component {
   }
 
   render() {
+    const formItemLayout = {
+      labelCol: { span: 6 },
+      wrapperCol: { span: 18 }
+    };
+
     return (
-			<form onSubmit={this.handleSubmit}>
-				<div className={styles.container}>
-					<label className={styles.label}>Project Name:</label>
-          <input id="projectName" type="text" value={this.state.projectName} onChange={this.handleChange} />
-				</div>
-				<div className={styles.container}>
-					<label className={styles.label}>API URL:</label>
-					<input id="apiURL" type="text" value={this.state.apiURL} onChange={this.handleChange} />
-				</div>
-				<div className={styles.submitDiv}>
-					<input type="submit" value="Submit" />
-				</div>
-			</form>
+			<Form onSubmit={this.handleSubmit}>
+        <Row>
+          <Col>
+  					<FormItem {...formItemLayout} label="Project Name" style={{marginRight: 6}}>
+              <Input id="projectName" type="text" value={this.state.projectName} onChange={this.handleChange}/>
+            </FormItem>
+          </Col>
+				</Row>
+				<Row>
+          <Col>
+  					<FormItem {...formItemLayout} label="API URl" style={{marginRight: 6}}>
+              <Input id="apiURL" type="text" value={this.state.apiURL} onChange={this.handleChange}/>
+            </FormItem>
+          </Col>
+				</Row>
+				<Row>
+          <Col>
+            <Button type="primary" htmlType="submit" onClick={this.handleSubmit} className={styles.button}>Submit</Button>
+          </Col>
+				</Row>
+			</Form>
     );
   }
 }

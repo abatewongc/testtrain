@@ -16,43 +16,31 @@ export default class MenuBuilder {
   }
 
   createModalWindow(modalWindowType, extraData) {
+
     let options = {
       parent: this.mainWindow,
-      height: 600,
-      width: 800,
       modal: true,
       show: false,
-      autoHideMenuBar: true
+      minimizable: false,
+      maximizable: false,
+      useContentSize: true,
+      autoHideMenuBar: true,
+      resizable: false
     }
     let child = new BrowserWindow(options);
     child.setMenu(null);
     if(modalWindowType === this.createProject) {
+      child.setSize(610, 200);
       child.loadURL(`file://${__dirname}/create-project-modal-window.html`);
     } else if(modalWindowType === this.addEndpoint) {
+      child.setSize(690, 400);
       child.loadURL(`file://${__dirname}/add-endpoint-modal-window.html`);
-    } else {
-      alert('Modal Window Type Error: Type is undefined [' + modalWindowType + ']');
     }
     if(child) {
       child.once('ready-to-show', () => {
         child.show();
       })
     }
-  }
-
-  addEndpointModalWindow() {
-    let options = {
-      parent: this.mainWindow,
-      height: 400,
-      width: 600,
-      modal: true,
-      show: false,
-      autoHideMenuBar: true
-    }
-    let child = new BrowserWindow(options);
-    child.once('ready-to-show', () => {
-      child.show()
-    })
   }
 
   buildMenu() {
