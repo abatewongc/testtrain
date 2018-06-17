@@ -85,6 +85,9 @@ class ConnectedEndpointViewer extends React.Component {
                     <Button type="primary" size="small" onClick={this.generateClicked}>Generate</Button>
                     <Button size="small" onClick={this.editClicked}>Edit</Button>
                     <Button size="small" onClick={this.deleteClicked}>Delete</Button>
+                </ButtonGroup>
+                <Divider style={{margin: "2px 8px 2px 8px" }}type='vertical'></Divider>
+                <ButtonGroup size="small">
                     <Button type="primary" size="small" onClick={this.runClicked}>Run</Button>
                     <Button size="small" onClick={this.viewClicked}>View</Button>
                     <Button size="small" onClick={this.uploadClicked} disabled="true">Upload</Button>
