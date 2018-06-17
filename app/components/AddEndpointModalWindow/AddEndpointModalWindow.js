@@ -1,11 +1,14 @@
 // eslint-disable class-methods-use-this
 import React, { Component } from 'react';
+import styles from './AddEndpointModalWindow.css'
+import { Form, Row, Input, Button, Col, Select } from 'antd';
 const {dialog} = require('electron').remote;
 const Store = require('electron-store');
-import styles from './AddEndpointModalWindow.css'
 const path = require('path');
 const dirTree = require('directory-tree');
 const remote = require('electron').remote;
+const FormItem = Form.Item;
+const Option = Select.Option;
 
 export default class CreateProjectModalWindow extends Component {
   constructor() {
@@ -34,6 +37,7 @@ export default class CreateProjectModalWindow extends Component {
 		switch(event.target.id) {
 			case 'endpoint':
 				this.setState({endpoint: event.target.value});
+        console.log(this.state)
 				break;
       case 'successCode':
         this.setState({successCode: event.target.value});
@@ -81,12 +85,24 @@ export default class CreateProjectModalWindow extends Component {
   }
 
   handleAddTestItem = () => {
+    let browserWindow = remote.getCurrentWindow();
+    let windowSize = remote.getCurrentWindow().getSize();
+    if(windowSize[1] < 600) {
+      browserWindow.setSize(windowSize[0], windowSize[1] + 60);
+    }
+
     this.setState({
       testItems: this.state.testItems.concat([{ parameter: '', type: '', testValue: ''}])
     });
   }
 
   handleRemoveTestItem = (idx) => () => {
+    let browserWindow = remote.getCurrentWindow();
+    let windowSize = remote.getCurrentWindow().getSize();
+    if(windowSize[1] > 340) {
+      browserWindow.setSize(windowSize[0], windowSize[1] - 60);
+    }
+
     this.setState({
       testItems: this.state.testItems.filter((s, sidx) => idx !== sidx)
     });
@@ -95,17 +111,17 @@ export default class CreateProjectModalWindow extends Component {
   createSelectItems() {
     let items = [];
     let projects = dirTree(new Store().get('testcase_datastorage_local'), {extensions:/\.tpf$/}).children;
-    items.push(<option key="0" value="Please Select a Project">Please Select a Project</option>);
+    items.push(<Option value="Please Select a Project">Please Select a Project</Option>);
     for(let i = 0; i < projects.length; i++) {
       let projectName = projects[i].name;
-      let index = i + 1;
-      items.push(<option key={index} value={projectName}>{projectName}</option>);
+      items.push(<Option value={projectName}>{projectName}</Option>);
     }
     return items;
   }
 
-  onDropdownSelected(event) {
-    this.setState({project: event.target.value});
+  onDropdownSelected(value, option) {
+    let project = option.props.value;
+    this.setState({project: project});
   }
 
   handleSubmit(event) {
@@ -142,58 +158,80 @@ export default class CreateProjectModalWindow extends Component {
   }
 
   test() {
-    let projects = dirTree(new Store().get('testcase_datastorage_local'), {extensions:/\.tpf$/}).children;
-    console.log(projects);
+    console.log(this.state);
   }
 
   render() {
+    const formItemLayout = {
+      labelCol: { span: 6 },
+      wrapperCol: { span: 18 }
+    };
+
+    const testItemLayout = {
+      labelCol: { span: 12 },
+      wrapperCol: { span: 12 }
+    };
+
     return (
-			<form onSubmit={this.handleSubmit}>
-        <div className={styles.container}>
-          <label className={styles.label}>Endpoint: </label>
-          <input id="endpoint" type="text" value={this.state.endpoint} onChange={this.handleChange} size="8"/>
-          <button type="button" onClick={this.handleAddTestItem} className="small" className={styles.button}>Add Parameter</button>
-        </div>
-        <div className={styles.container}>
-          <label className={styles.label}>Project: </label>
-          <select value={this.state.project} onChange={this.onDropdownSelected}>
-            {this.createSelectItems()}
-          </select>
-        </div>
+      <Form onSubmit={this.handleSubmit}>
+        <Row>
+          <Col span={24}>
+            <FormItem {...formItemLayout} label="Endpoint" style={{marginRight: 6}}>
+              <Input id="endpoint" type="text" value={this.state.endpoint} onChange={this.handleChange} />
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <FormItem {...formItemLayout} label="Project" style={{marginRight: 6}}>
+              <Select defaultValue={this.state.project} onSelect={this.onDropdownSelected}>
+                {this.createSelectItems()}
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
         {this.state.testItems.map((testItem, idx) => (
-          <div className={styles.container}>
-            <div className={styles.col_fourth}>
-              <label className={styles.label}>Parameter:</label>
-              <input type="text" value={testItem.parameter} onChange={this.handleTestParameter(idx)}  size="8" />
-            </div>
-            <div className={styles.col_fourth}>
-              <label className={styles.label}>Type</label>
-              <input type="text" value={testItem.type} onChange={this.handleTestType(idx)}  size="8" />
-            </div>
-            <div className={styles.col_fourth}>
-              <label className={styles.label}>Test Value</label>
-              <input type="text" value={testItem.testValue} onChange={this.handleTestTestValue(idx)} size="8" />
-            </div>
-            <div className={styles.col_fourth}>
-              <button type="button" onClick={this.handleRemoveTestItem(idx)} className={styles.button}>-</button>
-            </div>
-          </div>
+          <Row>
+            <Col span={6}>
+              <FormItem {...testItemLayout} label="Parameter">
+                <Input type="text" value={testItem.parameter} onChange={this.handleTestParameter(idx)} />
+              </FormItem>
+            </Col>
+            <Col span={6}>
+              <FormItem {...testItemLayout} label="Type">
+                <Input type="text" value={testItem.type} onChange={this.handleTestType(idx)} />
+              </FormItem>
+            </Col>
+            <Col span={6}>
+              <FormItem {...testItemLayout} label="Test Value">
+                <Input type="text" value={testItem.testValue} onChange={this.handleTestTestValue(idx)} />
+              </FormItem>
+            </Col>
+            <Col span={6}>
+              <Button onClick={this.handleRemoveTestItem(idx)} className={styles.button}>-</Button>
+            </Col>
+          </Row>
         ))}
-        <div className={styles.container}>
-          <label className={styles.label}>Successful Response Code:</label>
-          <input id="successCode" type="text" value={this.state.successCode} onChange={this.handleChange} size="8" />
-        </div>
-        <div className={styles.container}>
-          <label className={styles.label}>Failure Response Code:</label>
-          <input id="failCode" type="text" value={this.state.failCode} onChange={this.handleChange} size="8" />
-        </div>
-        <div className={styles.container}>
-          <input type="submit" onClick={this.handleSubmit} className={styles.button} />
-        </div>
-        <div className={styles.container}>
-          <button type="button" onClick={this.test} className={styles.button}>Test</button>
-        </div>
-			</form>
+        <Row>
+          <Col span={24}>
+            <FormItem {...formItemLayout} label="Success Response Code" style={{marginRight: 6}}>
+              <Input id="successCode" type="text" value={this.state.successCode} onChange={this.handleChange} />
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <FormItem {...formItemLayout} label="Fail Response Code" style={{marginRight: 6}}>
+              <Input id="failCode" type="text" value={this.state.failCode} onChange={this.handleChange} />
+            </FormItem>
+          </Col>
+        </Row>
+        <Row style={{marginBottom: 8}}>
+          <Button type="primary" htmlType="submit" onClick={this.handleSubmit} className={styles.button}>Submit</Button>
+          <Button onClick={this.handleAddTestItem} className={styles.button}>Add Parameter</Button>
+          <Button onClick={this.test} className={styles.button}>Test</Button>
+        </Row>
+			</Form>
     );
   }
 }
