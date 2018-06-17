@@ -75,33 +75,46 @@ class ConnectedTestProjectViewer extends React.Component {
 			name: _name,
 			fullurl: paths.join(endpoint.name.replace(new RegExp('&', 'g'), '/'), '/', _name),
 			success: endpoint.data.successCode,
-			fail: endpoint.data.failCode,
-			successoutput: [
+      fail: endpoint.data.failCode,
+      num_runs: 1000,
+      num_successes: 998,
+		  outputs: [
 				{
-					text: "experimental_success"
-					// other stuff?
+          key: "1",
+          parameter: "1",
+          type: "string",
+          value: "bye",
+				},
+				{
+          key: "2",
+          parameter: "2",
+          type: "integer",
+          value: "2",
+				},
+				{
+          key: "1",
+          parameter: "3",
+          type: "boolean",
+          value: "true",
 				}
 			],
-			failoutput:[
+			inputs: [
 				{
-					text: "experimental_failure"
-					// other this?
-				}
-			],
-			input: [
-				{
+          key: "1",
 					parameter: "1",
 					type: "string",
 					value: "hi",
 				},
 				{
+          key: "2",
 					parameter: "2",
 					type: "integer",
 					value: "2",
 				},{
+          key: "3",
 					parameter: "3",
 					type: "boolean",
-					value: "0",
+					value: "false",
 				}
 			]
 
