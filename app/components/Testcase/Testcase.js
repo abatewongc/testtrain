@@ -28,8 +28,8 @@ class ConnectedTestcase extends React.Component {
     render() {
         const { testcase } = this.props;
         return (
-            <Panel {...this.props} header={testcase.name}>
-                <div>
+            <Panel className="testcase_panel" {...this.props} header={testcase.name}>
+                <div style={style}>
                     {JSON.stringify(testcase)}
                 </div>
             </Panel>
@@ -38,6 +38,10 @@ class ConnectedTestcase extends React.Component {
 
 }
 
+const style = {
+    padding: "4px 8px 4px 8px"
+
+}
 
 
 
