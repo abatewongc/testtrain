@@ -27,15 +27,18 @@ class ConnectedTestcase extends React.Component {
 
     render() {
         const { testcase } = this.props;
-        console.log(testcase);
         return (
             <Panel {...this.props} header={testcase.name}>
-                <p>{JSON.stringify(testcase)}</p>
+                <div>
+                    {JSON.stringify(testcase)}
+                </div>
             </Panel>
         );
     }
 
 }
+
+
 
 
 const Testcase = connect(mapStateToProps, mapDispatchToProps)(ConnectedTestcase);

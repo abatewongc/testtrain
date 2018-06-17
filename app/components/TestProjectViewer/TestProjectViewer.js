@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, Menu, Icon } from 'antd';
+import { Layout, Menu, Icon, Divider } from 'antd';
 import { connect } from "react-redux";
 const { Header, Content, Footer, Sider } = Layout;
 import EndpointViewer from '../EndpointViewer/EndpointViewer'
@@ -111,13 +111,14 @@ class ConnectedTestProjectViewer extends React.Component {
 	}
 
 	extractTestcasesFromTEF(endpoint) {
-		let testcase1 = this.createTestCaseObject(endpoint);
-		let testcase2 = this.createTestCaseObject(endpoint);
-		let testcase3 = this.createTestCaseObject(endpoint);
-		let testcase4 = this.createTestCaseObject(endpoint);
-		let testcase5 = this.createTestCaseObject(endpoint);
+    let testcases = [];
 
-		return [ testcase1, testcase2, testcase3, testcase4, testcase5 ];
+    let j = 40;
+    for(let i = 0; i < j; i++) {
+      testcases.push(this.createTestCaseObject(endpoint));
+    }
+
+		return testcases;
 	}
 
   handleChange = (target) => (event) => {
@@ -159,7 +160,7 @@ class ConnectedTestProjectViewer extends React.Component {
 
   renderEndpoint() {
     if(this.state.current_endpoint) {
-      return <Panel header="Endpoint Information">{this.renderEndpointData()}</Panel>
+      return <Panel header="Endpoint Information" key="endpoint-info-panel">{this.renderEndpointData()}</Panel>
     }
   }
 
@@ -256,16 +257,17 @@ class ConnectedTestProjectViewer extends React.Component {
     this.state.edit = this.props.edit;
 		return (
 	    <Layout style={{ marginLeft: 0 , height: '100vh'}}>
-	      <Header style={{ background: '#F1F2F6', padding: 0, Position: 'fixed', zIndex: 1, height: '64px', overflow: 'hidden'}}>
+	      <Header style={{ background: '#F1F2F6', padding: "2px 0px 2px 0px", Position: 'fixed', zIndex: 1, height: '64px', overflow: 'hidden'}}>
 	          <EndpointViewer endpoint={this.state.current_endpoint}/>
 	      </Header>
-	      <Content style={{ margin: '24px 16px 0', overflow: 'auto', height: '95%' }}>
-	        <div style={{ padding: 24, background: '#fff', height: '100%', overflow: 'scroll'}}>
+        <Divider style={{ margin: '4px 4px 4px 4px'}}/>
+	      <Content style={{ margin: '8px 16px 0', overflow: 'auto', height: '95%' }}>
+	        <div style={{ padding: "8px 16px 0px", background: '#F1F2F6', height: '100%', overflow: 'scroll'}}>
             {this.renderContent()}
 					</div>
 	      </Content>
 	      <Footer style={{ textAlign: 'center', height: '24px', zIndex: 1 }}>
-	        Something would go here, IDK, maybe remove
+	        Something will go here, IDK, maybe remove
 	      </Footer>
 	    </Layout>
     )
