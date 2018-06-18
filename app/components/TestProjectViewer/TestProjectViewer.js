@@ -265,7 +265,7 @@ class ConnectedTestProjectViewer extends React.Component {
 					</div>
 	      </Content>
 	      <Footer style={{ textAlign: 'center', height: '24px', zIndex: 1 }}>
-	        Something would go here, IDK, maybe remove
+	        
 	      </Footer>
 	    </Layout>
     )

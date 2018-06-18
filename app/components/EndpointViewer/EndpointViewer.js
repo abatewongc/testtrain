@@ -62,7 +62,7 @@ class ConnectedEndpointViewer extends React.Component {
         if(disabled) {
           return (
             <div>
-            <div>You have nothing selected. (mongoloid)</div>
+            <div>You have nothing selected.</div>
             </div>
           )
         } else {
