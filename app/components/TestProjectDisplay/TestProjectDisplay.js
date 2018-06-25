@@ -41,8 +41,12 @@ class ConnectedTestProjectDisplay extends React.Component {
 			clearInterval(refreshid);
 		}
 		let _refreshid = setInterval(() => {
-			let menuItems = dirTree(this.props.dir, {extensions:/\.txt/}).children; // this extension is a FUCKING INCLUDE, NOT AN EXCLUDE
-			this.setState({menuItems});
+			try {
+				let menuItems = dirTree(this.props.dir, {extensions:/\.txt/}).children; // this extension is a FUCKING INCLUDE, NOT AN EXCLUDE
+				this.setState({menuItems});
+			} catch(err) {
+				console.log(err);
+			}
 		}, 500);
 		this.setState({
 			refreshid: _refreshid,

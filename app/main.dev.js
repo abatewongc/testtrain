@@ -86,6 +86,16 @@ app.on('ready', async () => {
     mainWindow = null;
   });
 
+  var handleRedirect = (e, url) => {
+    if(url != mainWindow.webContents.getURL()) {
+      e.preventDefault()
+      require('electron').shell.openExternal(url)
+    }
+  }
+  
+  mainWindow.webContents.on('will-navigate', handleRedirect)
+  mainWindow.webContents.on('new-window', handleRedirect)
+
   const config = new Store();
   if(!config.has('testcase_datastorage_local')) {
     config.set('testcase_datastorage_local', path.join(app.getPath('userData'), "\\test_case_data"));
@@ -93,7 +103,7 @@ app.on('ready', async () => {
 
   let dir = config.get('testcase_datastorage_local');
   if (!fs.existsSync(dir)){
-    fs.mkdirSync(path.join(dir, projectname));
+    fs.mkdirSync(path.join(dir));
 }
 
   // Start
