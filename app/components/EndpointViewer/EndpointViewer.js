@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { loadEndpoint, clearEndpoint, editEndpoint } from "../../actions/endpoint-viewer";
 import MenuBuilder from '../../menu.js';
 import styles from './EndpointViewer.css'
-const ButtonGroup = Button.Group;
 
 const mapStateToProps = state => {
     return {
@@ -33,19 +32,9 @@ class ConnectedEndpointViewer extends React.Component {
         this.editClicked = this.editClicked.bind(this);
         this.deleteClicked = this.deleteClicked.bind(this);
         this.uploadClicked = this.uploadClicked.bind(this);
-        this.runClicked = this.runClicked.bind(this);
-        this.viewClicked = this.viewClicked.bind(this);
       }
 
     generateClicked = (e) => {
-        console.log(e);
-
-    }
-    runClicked = (e) => {
-        console.log(e);
-
-    }
-    viewClicked = (e) => {
         console.log(e);
 
     }
@@ -73,7 +62,7 @@ class ConnectedEndpointViewer extends React.Component {
         if(disabled) {
           return (
             <div>
-            <div>You have nothing selected. (mongoloid)</div>
+            <div>You have nothing selected.</div>
             </div>
           )
         } else {
@@ -81,17 +70,14 @@ class ConnectedEndpointViewer extends React.Component {
             <div style={{paddingLeft: 12, paddingTop: '4px', paddingBottom: '0px', textAlign: 'left', overflow: 'auto', height: '100%', lineHeight: 1.1}}>
                 <p className="margin-0" id="endpoint_display_title">{endpoint.name.replace(new RegExp('&', 'g'), '/')}</p>
                 <div className={styles.buttonMenu} id="endpoint_display_path" >
-                <ButtonGroup size="small">
+                  <Divider type="vertical" />
                     <Button type="primary" size="small" onClick={this.generateClicked}>Generate</Button>
+                    <Divider type="vertical" />
                     <Button size="small" onClick={this.editClicked}>Edit</Button>
+                    <Divider type="vertical" />
                     <Button size="small" onClick={this.deleteClicked}>Delete</Button>
-                </ButtonGroup>
-                <Divider style={{margin: "2px 8px 2px 8px" }}type='vertical'></Divider>
-                <ButtonGroup size="small">
-                    <Button type="primary" size="small" onClick={this.runClicked}>Run</Button>
-                    <Button size="small" onClick={this.viewClicked}>View</Button>
-                    <Button size="small" onClick={this.uploadClicked} disabled="true">Upload</Button>
-                </ButtonGroup>
+                    <Divider type="vertical" />
+                    <Button size="small" onClick={this.uploadClicked}>Upload</Button>
                 </div>
             </div>
         );
