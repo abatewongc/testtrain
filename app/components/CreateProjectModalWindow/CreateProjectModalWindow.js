@@ -1,12 +1,14 @@
 // eslint-disable class-methods-use-this
 import React, { Component } from 'react';
-import { Form, Row, Input, Button, Col } from 'antd';
+import { Form, Row, Input, Button, Col, Spin } from 'antd';
 import styles from './CreateProjectModalWindow.css'
 const {dialog} = require('electron').remote;
 const Store = require('electron-store');
 const path = require('path');
 const remote = require('electron').remote;
 const FormItem = Form.Item;
+const fs = require('fs');
+const spawn = require('child_process').spawn;
 
 export default class CreateProjectModalWindow extends Component {
   constructor() {
@@ -33,18 +35,63 @@ export default class CreateProjectModalWindow extends Component {
 
   handleSubmit(event) {
 		event.preventDefault();
-		console.log('A name was submitted: ' + this.state.projectName);
-		let home_dir = new Store().get('testcase_datastorage_local')
+		let homeDir = new Store().get('testcase_datastorage_local');
+    let newDir = path.join(homeDir, this.state.projectName);
 		let store = new Store({
 			name: this.state.projectName,
-			cwd: path.join(home_dir, "\\", this.state.projectName),
+			cwd: newDir,
 			fileExtension: "tpf"
 		})
+		store.set('apiURL', this.state.apiURL);
 
-		store.set('apiURL', this.state.apiURL)
+    let packagePath = path.join(newDir, 'package.json');
+    let packageJson = {
+      "name": this.state.projectName,
+      "version": "1.0.0",
+      "description": "For testing API",
+      "author": "",
+      "license": "ISC",
+      "dependencies": {
+        "chai": "^4.1.2",
+        "chai-http": "^4.0.0",
+        "mocha": "^5.2.0",
+        "mochawesome": "^3.0.2",
+        "mochawesome-report-generator": "^3.1.2"
+      }
+    }
+    fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 4));
 
-		let window = remote.getCurrentWindow()
-		window.close()
+    let testPath = path.join(newDir, 'test');
+    if(!fs.existsSync(testPath)) {
+      fs.mkdirSync(testPath);
+    }
+
+    let args = ['install'];
+    console.log(newDir);
+    let options = {
+      cwd: newDir
+    }
+    const child = spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['install'], options);
+
+    let root = document.getElementById('modalRoot');
+    root.removeChild(root.children[0]);
+    let spinDiv = document.createElement('div');
+    spinDiv.className = styles.center;
+    let spinner = document.createElement('div');
+    spinner.className = 'ant-spin ant-spin-lg ant-spin-spinning';
+    let spinSpan = document.createElement('span');
+    spinSpan.className = 'ant-spin-dot ant-spin-dot-spin';
+    for(let i = 0; i < 4; i++) {
+      spinSpan.appendChild(document.createElement('i'));
+    }
+    spinner.appendChild(spinSpan);
+    spinDiv.appendChild(spinner);
+    root.appendChild(spinDiv);
+
+    child.on('close', function(code) {
+  		let window = remote.getCurrentWindow();
+  		window.close();
+    });
   }
 
   render() {
@@ -54,27 +101,29 @@ export default class CreateProjectModalWindow extends Component {
     };
 
     return (
-			<Form onSubmit={this.handleSubmit}>
-        <Row>
-          <Col>
-  					<FormItem {...formItemLayout} label="Project Name" style={{marginRight: 6}}>
-              <Input id="projectName" type="text" value={this.state.projectName} onChange={this.handleChange}/>
-            </FormItem>
-          </Col>
-				</Row>
-				<Row>
-          <Col>
-  					<FormItem {...formItemLayout} label="API URl" style={{marginRight: 6}}>
-              <Input id="apiURL" type="text" value={this.state.apiURL} onChange={this.handleChange}/>
-            </FormItem>
-          </Col>
-				</Row>
-				<Row>
-          <Col>
-            <Button type="primary" htmlType="submit" onClick={this.handleSubmit} className={styles.button}>Submit</Button>
-          </Col>
-				</Row>
-			</Form>
+      <div id="modalRoot">
+  			<Form onSubmit={this.handleSubmit}>
+          <Row>
+            <Col>
+    					<FormItem {...formItemLayout} label="Project Name" style={{marginRight: 6}}>
+                <Input id="projectName" type="text" value={this.state.projectName} onChange={this.handleChange}/>
+              </FormItem>
+            </Col>
+  				</Row>
+  				<Row>
+            <Col>
+    					<FormItem {...formItemLayout} label="API URl" style={{marginRight: 6}}>
+                <Input id="apiURL" type="text" value={this.state.apiURL} onChange={this.handleChange}/>
+              </FormItem>
+            </Col>
+  				</Row>
+  				<Row>
+            <Col>
+              <Button type="primary" htmlType="submit" onClick={this.handleSubmit} className={styles.button}>Submit</Button>
+            </Col>
+  				</Row>
+  			</Form>
+      </div>
     );
   }
 }
