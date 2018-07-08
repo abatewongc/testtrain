@@ -1,3 +1,9 @@
 .buttonMenu {
   margin-top: 6px;
 }
+
+.button {
+  float: right;
+  margin-right: 6px;
+  margin-top: 4px;
+}

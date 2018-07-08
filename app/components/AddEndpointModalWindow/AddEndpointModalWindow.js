@@ -16,7 +16,7 @@ export default class CreateProjectModalWindow extends Component {
     this.state = {
 			endpoint: '',
       project: 'Please Select a Project',
-      testItems: [{ parameter: '', type: '', testValue: ''}],
+      testItems: [{ parameter: '', type: ''}],
       successCode: '',
       failCode: ''
     };
@@ -25,7 +25,6 @@ export default class CreateProjectModalWindow extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleTestParameter = this.handleTestParameter.bind(this);
     this.handleTestType = this.handleTestType.bind(this);
-    this.handleTestTestValue = this.handleTestTestValue.bind(this);
     this.handleAddTestItem = this.handleAddTestItem.bind(this);
     this.handleRemoveTestItem = this.handleRemoveTestItem.bind(this);
     this.createSelectItems = this.createSelectItems.bind(this);
@@ -37,7 +36,6 @@ export default class CreateProjectModalWindow extends Component {
 		switch(event.target.id) {
 			case 'endpoint':
 				this.setState({endpoint: event.target.value});
-        console.log(this.state)
 				break;
       case 'successCode':
         this.setState({successCode: event.target.value});
@@ -72,18 +70,6 @@ export default class CreateProjectModalWindow extends Component {
     this.setState({testItems: newTestItems});
   }
 
-  handleTestTestValue = (idx) => (event) => {
-    const newTestItems = this.state.testItems.map((testItem, sidx) => {
-      if(idx !== sidx) {
-        return testItem;
-      } else {
-        return {...testItem, testValue: event.target.value};
-      }
-    });
-
-    this.setState({testItems: newTestItems});
-  }
-
   handleAddTestItem = () => {
     let browserWindow = remote.getCurrentWindow();
     let windowSize = remote.getCurrentWindow().getSize();
@@ -92,7 +78,7 @@ export default class CreateProjectModalWindow extends Component {
     }
 
     this.setState({
-      testItems: this.state.testItems.concat([{ parameter: '', type: '', testValue: ''}])
+      testItems: this.state.testItems.concat([{ parameter: '', type: ''}])
     });
   }
 
@@ -110,7 +96,7 @@ export default class CreateProjectModalWindow extends Component {
 
   createSelectItems() {
     let items = [];
-    let projects = dirTree(new Store().get('testcase_datastorage_local'), {extensions:/\.tpf$/}).children;
+    let projects = dirTree(new Store().get('testcase_datastorage_local'), {extensions:/\.tpf$/, exclude:/node_modules/}).children;
     items.push(<Option value="Please Select a Project">Please Select a Project</Option>);
     for(let i = 0; i < projects.length; i++) {
       let projectName = projects[i].name;
@@ -136,19 +122,23 @@ export default class CreateProjectModalWindow extends Component {
     if(projectName == 'Please Select a Project') {
       alert('Please Select a Project');
     } else {
-      let projects = dirTree(new Store().get('testcase_datastorage_local'), {extensions:/\.tpf$/}).children;
+      let projects = dirTree(new Store().get('testcase_datastorage_local'), {extensions:/\.tpf$/, exclude:/node_modules/}).children;
       projects.forEach(function(project) {
         if(project.name == projectName) {
           let fileName = endpoint.replace(new RegExp('/', 'g'), '&');
+          let tpfPath = path.join(project.path, project.name + '.tpf');
+          let testPath = path.join(project.path, 'test', fileName);
           let store = new Store({
             name: fileName,
-            cwd: path.join(project.path, "\\", fileName),
+            cwd: testPath,
             fileExtension: "tef"
           });
 
           store.set('testItems', testItems);
           store.set('successCode', successCode);
           store.set('failCode', failCode);
+          store.set('testcases', []);
+          store.set('tpfPath', tpfPath);
 
           let window = remote.getCurrentWindow();
           window.close();
@@ -158,7 +148,6 @@ export default class CreateProjectModalWindow extends Component {
   }
 
   test() {
-    console.log(this.state);
   }
 
   render() {
@@ -192,22 +181,17 @@ export default class CreateProjectModalWindow extends Component {
         </Row>
         {this.state.testItems.map((testItem, idx) => (
           <Row>
-            <Col span={6}>
+            <Col span={10}>
               <FormItem {...testItemLayout} label="Parameter">
                 <Input type="text" value={testItem.parameter} onChange={this.handleTestParameter(idx)} />
               </FormItem>
             </Col>
-            <Col span={6}>
+            <Col span={10}>
               <FormItem {...testItemLayout} label="Type">
                 <Input type="text" value={testItem.type} onChange={this.handleTestType(idx)} />
               </FormItem>
             </Col>
-            <Col span={6}>
-              <FormItem {...testItemLayout} label="Test Value">
-                <Input type="text" value={testItem.testValue} onChange={this.handleTestTestValue(idx)} />
-              </FormItem>
-            </Col>
-            <Col span={6}>
+            <Col span={4}>
               <Button onClick={this.handleRemoveTestItem(idx)} className={styles.button}>-</Button>
             </Col>
           </Row>
