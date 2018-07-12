@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Divider, Button, Modal, Form, Row, Input, Col, Select } from 'antd';
+import { Divider, Button, Modal, Form, Row, Input, Col, Select, Radio } from 'antd';
 import { connect } from "react-redux";
 import { loadEndpoint, clearEndpoint, editEndpoint } from "../../actions/endpoint-viewer";
 import MenuBuilder from '../../menu.js';
@@ -7,10 +7,11 @@ import TestResultViewer from '../TestResultViewer/TestResultViewer';
 import styles from './EndpointViewer.css';
 import path from 'path';
 const Store = require('electron-store');
+const fs = require('fs');
 const FormItem = Form.Item;
 const ButtonGroup = Button.Group;
+const RadioGroup = Radio.Group;
 const Option = Select.Option;
-const fs = require('fs');
 
 const mapStateToProps = state => {
 		return {
@@ -35,7 +36,9 @@ class ConnectedEndpointViewer extends React.Component {
 					endpoint: '',
 					generatorVisible: false,
 					reportViewerVisible: false,
-					requestType: 'GET'
+					requestType: 'GET',
+					radioOption: true,
+					expectedResponseProperties: [{parameter: '', type: 'number', value: ''}]
 				};
 
 				this.generateClicked = this.generateClicked.bind(this);
@@ -46,20 +49,93 @@ class ConnectedEndpointViewer extends React.Component {
 				this.viewClicked = this.viewClicked.bind(this);
 				this.renderGenerator = this.renderGenerator.bind(this);
 				this.renderParameters = this.renderParameters.bind(this);
-				this.toggleGeneratorModal = this.toggleGeneratorModal.bind(this);
+				this.handleGeneratorCancel = this.handleGeneratorCancel.bind(this);
+				this.onSuccessCodeClick = this.onSuccessCodeClick.bind(this);
+				this.onFailureCodeClick = this.onFailureCodeClick.bind(this);
+				this.handleAddResponseProperty = this.handleAddResponseProperty.bind(this);
+				this.handleRemoveResponseProperty = this.handleRemoveResponseProperty.bind(this);
 				this.submitTestcase = this.submitTestcase.bind(this);
 				this.onRequestTypeChange = this.onRequestTypeChange.bind(this);
+				this.onRadioChange = this.onRadioChange.bind(this);
 				this.toggleReportViewerModal = this.toggleReportViewerModal.bind(this);
 			}
 
-		toggleGeneratorModal = (generatorVisible) => {
-			this.setState({generatorVisible});
+		handleGeneratorCancel = () => {
+			this.setState({generatorVisible: false});
 		}
 
-		submitTestcase = (generatorVisible, endpoint) => {
+		onSuccessCodeClick = () => {
+			let expectedResponseCode = document.getElementById('expectedResponseCode');
+			expectedResponseCode.value = this.props.endpoint.data.successCode;
+		}
+
+		onFailureCodeClick = () => {
+			let expectedResponseCode = document.getElementById('expectedResponseCode');
+			expectedResponseCode.value = this.props.endpoint.data.failCode;
+		}
+
+		onRadioChange = (event) => {
+			this.setState({radioOption: event.target.value});
+		}
+
+	  handleResponseParameter = (idx) => (event) => {
+	    const newTestItems = this.state.expectedResponseProperties.map((property, sidx) => {
+	      if(idx !== sidx) {
+	        return property;
+	      } else {
+	        return {...property, parameter: event.target.value};
+	      }
+	    });
+
+	    this.setState({expectedResponseProperties: newTestItems});
+	  }
+
+	  handleParameterType = (idx) => (value, option) => {
+	    let type = option.props.value;
+	    const newTestItems = this.state.expectedResponseProperties.map((property, sidx) => {
+	      if(idx !== sidx) {
+	        return property;
+	      } else {
+	        return {...property, type: type};
+	      }
+	    });
+
+	    this.setState({expectedResponseProperties: newTestItems});
+	  }
+
+	  handleParameterValue = (idx) => (event) => {
+	    const newTestItems = this.state.expectedResponseProperties.map((property, sidx) => {
+	      if(idx !== sidx) {
+	        return property;
+	      } else {
+	        return {...property, value: event.target.value};
+	      }
+	    });
+
+	    this.setState({expectedResponseProperties: newTestItems});
+	  }
+
+	  handleAddResponseProperty = () => {
+	    this.setState({
+	      expectedResponseProperties: this.state.expectedResponseProperties.concat([{ parameter: '', type: 'number', value: ''}])
+	    });
+	  }
+
+	  handleRemoveResponseProperty = (idx) => () => {
+	    this.setState({
+	      expectedResponseProperties: this.state.expectedResponseProperties.filter((s, sidx) => idx !== sidx)
+	    });
+	  }
+
+		submitTestcase = () => {
 			//Get Form Item values
-			let formItems = document.getElementById('testcaseForm').elements;
-			console.log(formItems);
+			let endpoint = this.props.endpoint;
+			let formItems;
+			if(document.getElementById('testcaseForm')) {
+				formItems = document.getElementById('testcaseForm').elements;
+			} else {
+				return;
+			}
 			let tef = JSON.parse(fs.readFileSync(endpoint.tefPath, 'utf8'));
 			let testcases = tef.testcases;
 
@@ -67,12 +143,13 @@ class ConnectedEndpointViewer extends React.Component {
 			let testcase = {
 				testcaseName: formItems.testcaseName.value,
 				testcaseInformation: {
-					successCode: formItems.successCode.value,
-					failCode: formItems.failCode.value,
-					parameters: {}
+					expectedResponseCode: formItems.expectedResponseCode.value,
+					isArray: this.state.radioOption,
+					parameters: {},
+					expectedValues: this.state.expectedResponseProperties
 				}
 			}
-			
+
 			//Request type is not part of form items so get it from state instead
 			testcase.testcaseInformation['requestType'] = this.state.requestType;
 
@@ -80,7 +157,7 @@ class ConnectedEndpointViewer extends React.Component {
 			for(let i = 0; i < formItems.length; i++) {
 				let id = formItems[i].id;
 				let value = formItems[i].value;
-				if(id != 'testcaseName' && id != 'successCode' && id != 'failCode') {
+				if(id != 'testcaseName' && id != 'expectedResponseCode') {
 					testcase.testcaseInformation.parameters[id] = value;
 				}
 			}
@@ -98,7 +175,7 @@ class ConnectedEndpointViewer extends React.Component {
 
 			store.set('testcases', testcases);
 
-			this.setState({generatorVisible});
+			this.handleGeneratorCancel(false);
 		}
 
 		onRequestTypeChange(value, option) {
@@ -111,7 +188,12 @@ class ConnectedEndpointViewer extends React.Component {
 		}
 
 		generateClicked = (e) => {
-			this.toggleGeneratorModal(!this.state.generatorVisible);
+			this.setState({
+				generatorVisible: true}),
+				expectedResponseProperties: [{parameter: '', type: 'number', value: ''}],
+				requestType: 'GET',
+				radioOption: true
+			});
 		}
 
 		runClicked = (e) => {
@@ -160,8 +242,32 @@ class ConnectedEndpointViewer extends React.Component {
 				labelCol: { span: 6 },
 				wrapperCol: { span: 18 }
 			};
+			const formItemLayoutResponse = {
+				labelCol: { span: 8 },
+				wrapperCol: { span: 14 }
+			}
+			const formItemLayoutRequest = {
+				labelCol: { span: 12 },
+				wrapperCol: { span: 12 }
+			}
+			const formItemLayoutArray = {
+				labelCol: { span: 12 },
+				wrapperCol: { span: 12 }
+			}
+	    const formItemResponeProperties = {
+	      labelCol: { span: 10 },
+	      wrapperCol: { span: 14 }
+	    };
+	    const typeBool = "boolean";
+	    const typeString = "string";
+	    const typeNumber = "number";
+
 			return(
 	      <div id="modalRoot">
+					<div className="ant-modal-header">
+						<div className="ant-modal-title">Basic Test Case Parameters</div>
+					</div>
+					<br />
 	        <Form id="testcaseForm">
 						<Row>
 		          <Col span={24}>
@@ -171,8 +277,8 @@ class ConnectedEndpointViewer extends React.Component {
 		          </Col>
 						</Row>
 						<Row>
-							<Col span={24}>
-								<FormItem {...formItemLayout} label="Request Type" style={{marginRight: 6}}>
+							<Col span={12}>
+								<FormItem {...formItemLayoutRequest} label="Request Type" style={{marginRight: 6}}>
 									<Select id="testcaseRequestType" defaultValue="GET" onSelect={this.onRequestTypeChange}>
 		                <Option value="GET">GET</Option>
 										<Option value="POST">POST</Option>
@@ -181,23 +287,62 @@ class ConnectedEndpointViewer extends React.Component {
 		              </Select>
 								</FormItem>
 							</Col>
+							<Col span={12}>
+								<FormItem {...formItemLayoutArray} label="Array Response" style={{marginRight: 6}}>
+									<RadioGroup onChange={this.onRadioChange} value={this.state.radioOption}>
+										<Radio value={true}>yes</Radio>
+										<Radio value={false}>no</Radio>
+									</RadioGroup>
+								</FormItem>
+							</Col>
 						</Row>
 						{this.renderParameters(endpoint, formItemLayout)}
 		        <Row>
-		          <Col span={24}>
-		            <FormItem {...formItemLayout} label="Success Response Code" style={{marginRight: 6}}>
-		              <Input id="successCode" type="text" defaultValue={endpoint.data.successCode} />
+		          <Col span={18}>
+		            <FormItem {...formItemLayoutResponse} label="Expected Response Code" style={{marginRight: 6}}>
+		              <Input id="expectedResponseCode" type="text" defaultValue={endpoint.data.successCode} />
 		            </FormItem>
 		          </Col>
-		        </Row>
-		        <Row>
-		          <Col span={24}>
-		            <FormItem {...formItemLayout} label="Fail Response Code" style={{marginRight: 6}}>
-		              <Input id="failCode" type="text" defaultValue={endpoint.data.failCode} />
-		            </FormItem>
-		          </Col>
+							<Col span={3}>
+								<Button type="primary" className={styles.button} onClick={this.onSuccessCodeClick}>Succeeds</Button>
+							</Col>
+							<Col span={3}>
+								<Button type="danger" className={styles.button} onClick={this.onFailureCodeClick}>Fails</Button>
+							</Col>
 		        </Row>
 	        </Form>
+					<div className="ant-modal-header">
+						<div className="ant-modal-title">Expect JSON Response Parameters</div>
+					</div>
+					<br />
+					<Form id="expectedJsonResponseForm">
+						{this.state.expectedResponseProperties.map((responseProperty, idx) => (
+							<Row key={"Row_" + idx}>
+								<Col span={6}>
+									<FormItem {...formItemResponeProperties} label="Property">
+										<Input type="text" value={responseProperty.parameter} onChange={this.handleResponseParameter(idx)} />
+									</FormItem>
+								</Col>
+								<Col span={6}>
+									<FormItem {...formItemResponeProperties} label="Type">
+										<Select type="text" value={responseProperty.type} onChange={this.handleParameterType(idx)}>
+											<Option value="Number">{typeNumber}</Option>
+											<Option value="String">{typeString}</Option>
+											<Option value="Boolean">{typeBool}</Option>
+										</Select>
+									</FormItem>
+								</Col>
+								<Col span={6}>
+									<FormItem {...formItemResponeProperties} label="Value">
+										<Input type="text" value={responseProperty.value} onChange={this.handleParameterValue(idx)} />
+									</FormItem>
+								</Col>
+								<Col span={4}>
+									<Button onClick={this.handleRemoveResponseProperty(idx)} className={styles.button}>-</Button>
+								</Col>
+							</Row>
+						))}
+					</Form>
 	      </div>
 			)
 		}
@@ -212,7 +357,7 @@ class ConnectedEndpointViewer extends React.Component {
 				if(disabled) {
 					return (
 						<div>
-						<div>You have nothing selected. (mongoloid)</div>
+							<div>You have nothing selected. (mongoloid)</div>
 						</div>
 					)
 				} else {
@@ -226,12 +371,16 @@ class ConnectedEndpointViewer extends React.Component {
 													title="Generate Testcase"
 													style={{ top: 20 }}
 													visible={this.state.generatorVisible}
-													onOk={() => this.submitTestcase(false, endpoint)}
-													onCancel={() => this.toggleGeneratorModal(false)}
 													bodyStyle={{ bodyStyle }}
+													onOk={this.submitTestcase}
+													onCancel={this.handleGeneratorCancel}
 													destroyOnClose = {true}
 													width='80%'
-													okText='Submit'
+													footer={[
+														<Button key="add" onClick={this.handleAddResponseProperty}>Add Response Property</Button>,
+														<Button key="back" onClick={this.handleGeneratorCancel}>Cancel</Button>,
+														<Button key="submit" onClick={this.submitTestcase}>Submit</Button>
+													]}
 												>
 													{this.renderGenerator(endpoint)}
 												</Modal>

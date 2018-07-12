@@ -16,7 +16,7 @@ export default class CreateProjectModalWindow extends Component {
     this.state = {
 			endpoint: '',
       project: 'Please Select a Project',
-      testItems: [{ parameter: '', type: ''}],
+      testItems: [{ parameter: '', type: 'number'}],
       successCode: '',
       failCode: ''
     };
@@ -58,12 +58,13 @@ export default class CreateProjectModalWindow extends Component {
     this.setState({testItems: newTestItems});
   }
 
-  handleTestType = (idx) => (event) => {
+  handleTestType = (idx) => (value, option) => {
+    let type = option.props.value;
     const newTestItems = this.state.testItems.map((testItem, sidx) => {
       if(idx !== sidx) {
         return testItem;
       } else {
-        return {...testItem, type: event.target.value};
+        return {...testItem, type: type};
       }
     });
 
@@ -78,7 +79,7 @@ export default class CreateProjectModalWindow extends Component {
     }
 
     this.setState({
-      testItems: this.state.testItems.concat([{ parameter: '', type: ''}])
+      testItems: this.state.testItems.concat([{ parameter: '', type: 'number'}])
     });
   }
 
@@ -160,6 +161,9 @@ export default class CreateProjectModalWindow extends Component {
       labelCol: { span: 12 },
       wrapperCol: { span: 12 }
     };
+    const typeBool = "boolean";
+    const typeString = "string";
+    const typeNumber = "number";
 
     return (
       <Form onSubmit={this.handleSubmit}>
@@ -188,7 +192,11 @@ export default class CreateProjectModalWindow extends Component {
             </Col>
             <Col span={10}>
               <FormItem {...testItemLayout} label="Type">
-                <Input type="text" value={testItem.type} onChange={this.handleTestType(idx)} />
+                <Select type="text" value={testItem.type} onChange={this.handleTestType(idx)}>
+                  <Option value="Number">{typeNumber}</Option>
+                  <Option value="String">{typeString}</Option>
+                  <Option value="Boolean">{typeBool}</Option>
+                </Select>
               </FormItem>
             </Col>
             <Col span={4}>

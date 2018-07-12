@@ -71,65 +71,65 @@ class ConnectedTestProjectViewer extends React.Component {
   		// ANY HARDCODED DATA IN THIS METHOD WOULD BE EXTRACTED IN THIS BLOCK
   		// let _name = 'experimental'
   		// ************************************************************** */
-  	// 	let testcase = {
-		// 	name: _name,
-		// 	fullurl: paths.join(endpoint.name.replace(new RegExp('&', 'g'), '/'), '/', _name),
-		// 	success: endpoint.data.successCode,
-    //   fail: endpoint.data.failCode,
-    //   num_runs: 1000,
-    //   num_successes: 998,
-		//   outputs: [
-		// 		{
-    //       key: "1",
-    //       parameter: "1",
-    //       type: "string",
-    //       value: "bye",
-		// 		},
-		// 		{
-    //       key: "2",
-    //       parameter: "2",
-    //       type: "integer",
-    //       value: "2",
-		// 		},
-		// 		{
-    //       key: "1",
-    //       parameter: "3",
-    //       type: "boolean",
-    //       value: "true",
-		// 		}
-		// 	],
-		// 	inputs: [
-		// 		{
-    //       key: "1",
-		// 			parameter: "1",
-		// 			type: "string",
-		// 			value: "hi",
-		// 		},
-		// 		{
-    //       key: "2",
-		// 			parameter: "2",
-		// 			type: "integer",
-		// 			value: "2",
-		// 		},{
-    //       key: "3",
-		// 			parameter: "3",
-		// 			type: "boolean",
-		// 			value: "false",
-		// 		}
-		// 	]
-    //
-		// }
-    //
-		// return testcase;
+  		let testcase = {
+			name: _name,
+			fullurl: paths.join(endpoint.name.replace(new RegExp('&', 'g'), '/'), '/', _name),
+			success: endpoint.data.successCode,
+      fail: endpoint.data.failCode,
+      num_runs: 1000,
+      num_successes: 998,
+		  outputs: [
+				{
+          key: "1",
+          parameter: "1",
+          type: "string",
+          value: "bye",
+				},
+				{
+          key: "2",
+          parameter: "2",
+          type: "integer",
+          value: "2",
+				},
+				{
+          key: "1",
+          parameter: "3",
+          type: "boolean",
+          value: "true",
+				}
+			],
+			inputs: [
+				{
+          key: "1",
+					parameter: "1",
+					type: "string",
+					value: "hi",
+				},
+				{
+          key: "2",
+					parameter: "2",
+					type: "integer",
+					value: "2",
+				},{
+          key: "3",
+					parameter: "3",
+					type: "boolean",
+					value: "false",
+				}
+			]
+
+		}
+
+		return testcase;
 	}
 
 	extractTestcasesFromTEF(endpoint) {
+    let tefTestcases = endpoint.testcases;
     let testcases = [];
 
-    let j = 40;
-    for(let i = 0; i < j; i++) {
+    // for(let i = 0; i < j; i++) {
       // testcases.push(this.createTestCaseObject(endpoint));
-    }
+    // }
 
 		return testcases;
 	}
