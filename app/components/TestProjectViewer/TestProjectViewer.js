@@ -260,7 +260,7 @@ class ConnectedTestProjectViewer extends React.Component {
     if(this.state.current_endpoint) {
       let testcases = this.extractTestcasesFromTEF(this.state.current_endpoint);
       if(testcases) {
-        return testcases.map((tc, index) => (<Testcase testcase={tc} key={tc.name.concat('_testcase_').concat(index)} />))
+        return testcases.map((tc, index) => (<Testcase testcase={tc} uuid={tc.name.concat('_testcase_').concat(index)} key={tc.name.concat('_testcase_').concat(index)} />))
       }
     }
   }

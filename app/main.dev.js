@@ -92,7 +92,7 @@ app.on('ready', async () => {
       require('electron').shell.openExternal(url)
     }
   }
-  
+
   mainWindow.webContents.on('will-navigate', handleRedirect)
   mainWindow.webContents.on('new-window', handleRedirect)
 
@@ -109,5 +109,9 @@ app.on('ready', async () => {
   // Start
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
+
+  mainWindow.on('add-new-project', () => {
+    menuBuilder.createModalWindow(menuBuilder.createProject);
+  });
 
 });

@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { Menu, Icon, Switch } from 'antd';
+import {
+	Menu,
+	Icon,
+	Switch,
+	Button,
+} from 'antd';
 import MenuItem from 'antd/lib/menu/MenuItem';
 const Store = require('electron-store');
 const dirTree = require('directory-tree');
@@ -8,6 +13,8 @@ const fs = require('fs');
 const SubMenu = Menu.SubMenu;
 import { connect } from "react-redux";
 import { loadEndpoint } from "../../actions/endpoint-viewer";
+import styles from './TestProjectDisplay.css';
+const remote = require('electron').remote;
 
 const mapStateToProps = state => {
 	return {
@@ -79,7 +86,14 @@ class ConnectedTestProjectDisplay extends React.Component {
     }
   }
 
-	handleClick = (e) => {
+	handleAddButtonClick = (e) => {
+		console.log(e);
+		console.log("add button clicked");
+		let browserWindow = remote.getCurrentWindow()
+		browserWindow.emit('add-new-project');
+	}
+
+	handleMenuClick = (e) => {
 		this.setState({
 			current: e.key,
 		});
@@ -127,7 +141,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 				/>
 				<Menu
 					theme={this.state.theme}
-					onClick={this.handleClick}
+					onClick={this.handleMenuClick}
 					style={{ width: 250 }}
 					onOpenChange={this.onOpenChange}
 					selectedKeys={[this.state.current]}
@@ -138,6 +152,14 @@ class ConnectedTestProjectDisplay extends React.Component {
 					menudata.map(data => <ProjectMenuItem key={data.path} data={data} /> )
 				}
 				</Menu>
+				<Button
+					type="primary"
+					shape="circle"
+					icon="plus"
+					size="default"
+					onClick={this.handleAddButtonClick}
+					className={styles.addButton}
+				></Button>
 			</div>
 		);
 	}
