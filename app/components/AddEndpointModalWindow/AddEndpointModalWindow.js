@@ -148,9 +148,6 @@ export default class CreateProjectModalWindow extends Component {
     }
   }
 
-  test() {
-  }
-
   render() {
     const formItemLayout = {
       labelCol: { span: 6 },
@@ -161,9 +158,9 @@ export default class CreateProjectModalWindow extends Component {
       labelCol: { span: 12 },
       wrapperCol: { span: 12 }
     };
-    const typeBool = "boolean";
-    const typeString = "string";
-    const typeNumber = "number";
+    const typeBool = "Boolean";
+    const typeString = "String";
+    const typeNumber = "Number";
 
     return (
       <Form onSubmit={this.handleSubmit}>
@@ -193,9 +190,9 @@ export default class CreateProjectModalWindow extends Component {
             <Col span={10}>
               <FormItem {...testItemLayout} label="Type">
                 <Select type="text" value={testItem.type} onChange={this.handleTestType(idx)}>
-                  <Option value="Number">{typeNumber}</Option>
-                  <Option value="String">{typeString}</Option>
-                  <Option value="Boolean">{typeBool}</Option>
+                  <Option value={typeNumber}>{typeNumber}</Option>
+                  <Option value={typeString}>{typeString}</Option>
+                  <Option value={typeBool}>{typeBool}</Option>
                 </Select>
               </FormItem>
             </Col>

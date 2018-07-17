@@ -42,7 +42,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 		}
 		let _refreshid = setInterval(() => {
 			try {
-				let menuItems = dirTree(this.props.dir, {extensions:/\.txt/, exclude: /node_modules/}).children; // this extension is a FUCKING INCLUDE, NOT AN EXCLUDE
+				let menuItems = dirTree(this.props.dir, {extensions:/\.txt/, exclude: [/node_modules/, /mochawesome-report/]}).children;
 				this.setState({menuItems});
 			} catch(err) {
 				console.log(err);

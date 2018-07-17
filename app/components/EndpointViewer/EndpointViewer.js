@@ -6,6 +6,7 @@ import MenuBuilder from '../../menu.js';
 import TestResultViewer from '../TestResultViewer/TestResultViewer';
 import styles from './EndpointViewer.css';
 import path from 'path';
+const generateTestcases = require('./TestcaseGenerator');
 const Store = require('electron-store');
 const fs = require('fs');
 const FormItem = Form.Item;
@@ -157,7 +158,7 @@ class ConnectedEndpointViewer extends React.Component {
 			for(let i = 0; i < formItems.length; i++) {
 				let id = formItems[i].id;
 				let value = formItems[i].value;
-				if(id != 'testcaseName' && id != 'expectedResponseCode') {
+				if(id != 'testcaseName' && id != 'expectedResponseCode' && id && value) {
 					testcase.testcaseInformation.parameters[id] = value;
 				}
 			}
@@ -175,6 +176,31 @@ class ConnectedEndpointViewer extends React.Component {
 
 			store.set('testcases', testcases);
 
+	    //Get root and remove everything
+	    let root = document.getElementById('modalRoot');
+	    root.removeChild(root.children[0]);
+
+	    //Create spinner div to center
+	    let spinDiv = document.createElement('div');
+	    spinDiv.className = styles.center;
+
+	    //Create loading spinner
+	    let spinner = document.createElement('div');
+	    spinner.className = 'ant-spin ant-spin-lg ant-spin-spinning';
+
+	    //Creating the dots for the spinner
+	    let spinSpan = document.createElement('span');
+	    spinSpan.className = 'ant-spin-dot ant-spin-dot-spin';
+	    for(let i = 0; i < 4; i++) {
+	      spinSpan.appendChild(document.createElement('i'));
+	    }
+
+	    //Append loading spinner to root
+	    spinner.appendChild(spinSpan);
+	    spinDiv.appendChild(spinner);
+	    root.appendChild(spinDiv);
+
+			generateTestcases(endpoint, testcases);
 			this.handleGeneratorCancel(false);
 		}
 
@@ -189,7 +215,7 @@ class ConnectedEndpointViewer extends React.Component {
 
 		generateClicked = (e) => {
 			this.setState({
-				generatorVisible: true}),
+				generatorVisible: true,
 				expectedResponseProperties: [{parameter: '', type: 'number', value: ''}],
 				requestType: 'GET',
 				radioOption: true
@@ -258,14 +284,14 @@ class ConnectedEndpointViewer extends React.Component {
 	      labelCol: { span: 10 },
 	      wrapperCol: { span: 14 }
 	    };
-	    const typeBool = "boolean";
-	    const typeString = "string";
-	    const typeNumber = "number";
+	    const typeBool = "Boolean";
+	    const typeString = "String";
+	    const typeNumber = "Number";
 
 			return(
 	      <div id="modalRoot">
 					<div className="ant-modal-header">
-						<div className="ant-modal-title">Basic Test Case Parameters</div>
+						<div className="ant-modal-title">Basic Testcase Parameters</div>
 					</div>
 					<br />
 	        <Form id="testcaseForm">
@@ -326,9 +352,9 @@ class ConnectedEndpointViewer extends React.Component {
 								<Col span={6}>
 									<FormItem {...formItemResponeProperties} label="Type">
 										<Select type="text" value={responseProperty.type} onChange={this.handleParameterType(idx)}>
-											<Option value="Number">{typeNumber}</Option>
-											<Option value="String">{typeString}</Option>
-											<Option value="Boolean">{typeBool}</Option>
+											<Option value={typeNumber}>{typeNumber}</Option>
+											<Option value={typeString}>{typeString}</Option>
+											<Option value={typeBool}>{typeBool}</Option>
 										</Select>
 									</FormItem>
 								</Col>
