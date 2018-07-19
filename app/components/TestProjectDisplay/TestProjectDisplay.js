@@ -49,7 +49,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 		}
 		let _refreshid = setInterval(() => {
 			try {
-				let menuItems = dirTree(this.props.dir, {extensions:/\.txt/}).children; // this extension is a FUCKING INCLUDE, NOT AN EXCLUDE
+				let menuItems = dirTree(this.props.dir, {extensions:/\.txt/, exclude: [/node_modules/, /mochawesome-report/]}).children;
 				this.setState({menuItems});
 			} catch(err) {
 				console.log(err);
@@ -69,7 +69,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 
   getProjectPath = (key) => {
     for(let i = 0; i < this.state.menuItems.length; i++) {
-      let project = this.state.menuItems[i];
+      let project = this.state.menuItems[i].children[0];
       for(let j = 0; j < project.children.length; j++) {
         let child = project.children[j];
         if(child.name == key) {
@@ -168,9 +168,12 @@ class ConnectedTestProjectDisplay extends React.Component {
 const ProjectMenuItem = (props) =>
 	<SubMenu {...props} data={props.data} key={props.data.path} title={<span><Icon type="folder" /><span>{props.data.name}</span></span>}>
 	{
-		props.data.children.map(ep => <Menu.Item data={ep} key={ep.name}>{ep.name.replace(new RegExp('&', 'g'), '/')}</Menu.Item>)
+		//Need to find a way to map to test directory better
+		props.data.children[0].children.map(ep => <Menu.Item data={ep} key={ep.name}>{ep.name.replace(new RegExp('&', 'g'), '/')}</Menu.Item>)
 	}
 	</SubMenu>
+
+
 
 const TestProjectDisplay = connect(mapStateToProps, mapDispatchToProps)(ConnectedTestProjectDisplay);
 

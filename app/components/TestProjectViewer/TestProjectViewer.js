@@ -69,7 +69,7 @@ class ConnectedTestProjectViewer extends React.Component {
   		// ************************************************************** */
   		// THIS IS WHERE WE WOULD GET THE DATA FROM THE TEF
   		// ANY HARDCODED DATA IN THIS METHOD WOULD BE EXTRACTED IN THIS BLOCK
-  		let _name = 'experimental'
+  		// let _name = 'experimental'
   		// ************************************************************** */
   		let testcase = {
 			name: _name,
@@ -124,12 +124,12 @@ class ConnectedTestProjectViewer extends React.Component {
 	}
 
 	extractTestcasesFromTEF(endpoint) {
+    let tefTestcases = endpoint.testcases;
     let testcases = [];
 
-    let j = 40;
-    for(let i = 0; i < j; i++) {
-      testcases.push(this.createTestCaseObject(endpoint));
-    }
+    // for(let i = 0; i < j; i++) {
+      // testcases.push(this.createTestCaseObject(endpoint));
+    // }
 
 		return testcases;
 	}
@@ -192,7 +192,6 @@ class ConnectedTestProjectViewer extends React.Component {
         parameters.forEach(function(parameter) {
           let parameterName = parameter.parameter;
           let parameterType = parameter.type;
-          let testValue = parameter.testValue;
           if(edit) {
             endpointInformation.push(
               <div className={styles.container}>
@@ -200,8 +199,6 @@ class ConnectedTestProjectViewer extends React.Component {
                 <input id={parameterName} value={parameterName} className={styles.inputBox} onChange={handleParameterChange(parameterName, 'parameter')} />
                 <label className={styles.label}>Type: </label>
                 <input id={parameterName + '_' + parameterType} value={parameterType} className={styles.inputBox} onChange={handleParameterChange(parameterName, 'type')} />
-                <label className={styles.label}>Test Value: </label>
-                <input id={testValue} value={testValue} className={styles.inputBox} onChange={handleParameterChange(parameterName, 'testValue')} />
               </div>
             )
           } else {
@@ -211,8 +208,6 @@ class ConnectedTestProjectViewer extends React.Component {
                 <input id={endpointName + '_' + parameterName} value={parameterName} className={styles.inputBox} disabled/>
                 <label className={styles.label}>Type: </label>
                 <input id={endpointName + '_' + parameterName + '_' + parameterType} value={parameterType} className={styles.inputBox} disabled/>
-                <label className={styles.label}>Test Value: </label>
-                <input id={endpointName +'_' + parameterName + '-' + testValue} value={testValue} className={styles.inputBox} disabled/>
               </div>
             )
           }

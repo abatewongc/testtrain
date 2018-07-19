@@ -24,8 +24,7 @@ export default class MenuBuilder {
       minimizable: false,
       maximizable: false,
       useContentSize: true,
-      autoHideMenuBar: true,
-      resizable: false
+      autoHideMenuBar: true
     }
     let child = new BrowserWindow(options);
     child.setMenu(null);
