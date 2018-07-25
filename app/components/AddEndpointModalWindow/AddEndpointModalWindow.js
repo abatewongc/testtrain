@@ -29,7 +29,6 @@ export default class CreateProjectModalWindow extends Component {
     this.handleRemoveTestItem = this.handleRemoveTestItem.bind(this);
     this.createSelectItems = this.createSelectItems.bind(this);
     this.onDropdownSelected = this.onDropdownSelected.bind(this);
-    this.test = this.test.bind(this);
   }
 
   handleChange(event) {

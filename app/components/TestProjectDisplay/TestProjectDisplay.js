@@ -39,7 +39,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 			menuRoot: ''
 		}
 
-	this.getProjectPath = this.getProjectPath.bind(this);
+	this.getEndpointData = this.getEndpointData.bind(this);
 	}
 
 	componentDidMount() {
@@ -67,13 +67,13 @@ class ConnectedTestProjectDisplay extends React.Component {
 		});
 	}
 
-  getProjectPath = (key) => {
+  getEndpointData = (key) => {
     for(let i = 0; i < this.state.menuItems.length; i++) {
       let project = this.state.menuItems[i].children[0];
       for(let j = 0; j < project.children.length; j++) {
         let child = project.children[j];
         if(child.name == key) {
-          let projectName = project.name;
+          let projectName = this.state.menuItems[i].name;
           let tefPath = path.join(project.path, key, key + '.tef');
           let data = JSON.parse(fs.readFileSync(tefPath, 'utf8'));
           return {
@@ -98,7 +98,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 			current: e.key,
 		});
 		if(!e.keyPath[0].endsWith(".tpf")) {
-      let endpointData = this.getProjectPath(e.key);
+      let endpointData = this.getEndpointData(e.key);
       const endpoint = {
           name: e.key,
           projectName: endpointData.projectName,
