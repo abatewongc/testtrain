@@ -2,9 +2,14 @@ import React, { Component } from 'react';
 import {
 	Menu,
 	Icon,
+	Select,
 	Switch,
 	Button,
+	Form,
+	Modal,
 } from 'antd';
+const FormItem = Form.Item;
+const { Option, OptGroup } = Select;
 import MenuItem from 'antd/lib/menu/MenuItem';
 const Store = require('electron-store');
 const dirTree = require('directory-tree');
@@ -15,6 +20,7 @@ import { connect } from "react-redux";
 import { loadEndpoint } from "../../actions/endpoint-viewer";
 import styles from './TestProjectDisplay.css';
 const remote = require('electron').remote;
+var rimraf = require('rimraf');
 
 const mapStateToProps = state => {
 	return {
@@ -34,12 +40,21 @@ class ConnectedTestProjectDisplay extends React.Component {
 		this.state = {
 			theme: 'light',
 			current: '1',
+			currentlySelectedProjectToDelete: '',
 			menuItems: [],
+			tempMenuItems: [],
 			openKeys: [],
-			menuRoot: ''
+			menuRoot: '',
+			projectDeleteModalVisible: false
 		}
 
 	this.getEndpointData = this.getEndpointData.bind(this);
+	this.handleDeleteProjectButtonClick = this.handleDeleteProjectButtonClick.bind(this);
+	this.handleDeleteProjectCancel = this.handleDeleteProjectCancel.bind(this);
+	this.handleDeleteProject = this.handleDeleteProject.bind(this);
+	this.handleDeleteProjectModalSelection = this.handleDeleteProjectModalSelection.bind(this);
+	this.handleAddButtonClick = this.handleAddButtonClick.bind(this);
+
 	}
 
 	componentDidMount() {
@@ -93,6 +108,35 @@ class ConnectedTestProjectDisplay extends React.Component {
 		browserWindow.emit('add-new-project');
 	}
 
+	handleDeleteProjectButtonClick = (e) => {
+		this.setState({currentlySelectedProjectToDelete: ''});
+		this.setState({tempMenuItems: this.state.menuItems})
+		this.setState({projectDeleteModalVisible: true});
+	}
+
+	handleDeleteProject = (e) => {
+		let projectToDelete = this.state.currentlySelectedProjectToDelete;
+		if(!projectToDelete || projectToDelete === '') {
+			return;
+		}
+
+		try {
+			rimraf.sync(projectToDelete);
+		} catch(error) {
+			// ignore this cuz im lazy and this isn't an enterprise app
+		}
+
+		this.setState({projectDeleteModalVisible: false});
+	}
+
+	handleDeleteProjectModalSelection = (value) => {
+		this.setState({currentlySelectedProjectToDelete: value});
+	}
+
+	handleDeleteProjectCancel = (e) => {
+		this.setState({projectDeleteModalVisible: false});
+	}
+
 	handleMenuClick = (e) => {
 		this.setState({
 			current: e.key,
@@ -129,6 +173,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 
 	render() {
 		let menudata = this.state.menuItems;
+		let tempMenuData = this.state.tempMenuItems;
 		return (
 			<div>
 				<Switch
@@ -153,6 +198,14 @@ class ConnectedTestProjectDisplay extends React.Component {
 				}
 				</Menu>
 				<Button
+					type="default"
+					shape="circle"
+					icon="minus"
+					size="default"
+					onClick={this.handleDeleteProjectButtonClick}
+					className={styles.addButton}
+				></Button>
+				<Button
 					type="primary"
 					shape="circle"
 					icon="plus"
@@ -160,6 +213,28 @@ class ConnectedTestProjectDisplay extends React.Component {
 					onClick={this.handleAddButtonClick}
 					className={styles.addButton}
 				></Button>
+				<Modal
+					title="Delete Project"
+					style={{ top: 20 }}
+					visible={this.state.projectDeleteModalVisible}
+					destroyOnClose={true}
+					width='60%'
+					onOk={this.handleDeleteProject}
+					onCancel={this.handleDeleteProjectCancel}
+				>
+					<FormItem {...formItemLayout} label="Select Project">
+						<Select id="deleteProjectModalSelect"
+							style={{
+								width: '60%'
+							}}
+							onChange={this.handleDeleteProjectModalSelection}
+						>
+								{
+									tempMenuData.map((data) => <Option key={data.path} value={data.path}>{data.name}</Option>)
+								}
+						</Select>
+					</FormItem>
+				</Modal>
 			</div>
 		);
 	}
@@ -173,6 +248,10 @@ const ProjectMenuItem = (props) =>
 	}
 	</SubMenu>
 
+const formItemLayout = {
+	labelCol: { span: 6 },
+	wrapperCol: { span: 18 }
+};
 
 
 const TestProjectDisplay = connect(mapStateToProps, mapDispatchToProps)(ConnectedTestProjectDisplay);
