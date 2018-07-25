@@ -9,10 +9,13 @@ import path from 'path';
 const generateTestcases = require('./TestcaseGenerator');
 const Store = require('electron-store');
 const fs = require('fs');
+const util = require('util');
+const spawn = require('child_process').spawn;
 const FormItem = Form.Item;
 const ButtonGroup = Button.Group;
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
+const OptGroup = Select.OptGroup;
 
 const mapStateToProps = state => {
 		return {
@@ -36,9 +39,16 @@ class ConnectedEndpointViewer extends React.Component {
 				this.state = {
 					endpoint: '',
 					generatorVisible: false,
+					runnerVisible: false,
 					reportViewerVisible: false,
 					requestType: 'GET',
-					radioOption: true,
+					testToRun: '',
+					testrunName: '',
+					isArrayResponse: true,
+					saveResults: true,
+					showCode: false,
+					reporterOptions: [],
+					disableForms: false,
 					expectedResponseProperties: [{parameter: '', type: 'number', value: ''}]
 				};
 
@@ -50,19 +60,31 @@ class ConnectedEndpointViewer extends React.Component {
 				this.viewClicked = this.viewClicked.bind(this);
 				this.renderGenerator = this.renderGenerator.bind(this);
 				this.renderParameters = this.renderParameters.bind(this);
+				this.renderRunner = this.renderRunner.bind(this);
+				this.handleChange = this.handleChange.bind(this);
+				this.handleTestcaseSelection = this.handleTestcaseSelection.bind(this);
 				this.handleGeneratorCancel = this.handleGeneratorCancel.bind(this);
+				this.handleRunnerCancel = this.handleRunnerCancel.bind(this);
 				this.onSuccessCodeClick = this.onSuccessCodeClick.bind(this);
 				this.onFailureCodeClick = this.onFailureCodeClick.bind(this);
 				this.handleAddResponseProperty = this.handleAddResponseProperty.bind(this);
 				this.handleRemoveResponseProperty = this.handleRemoveResponseProperty.bind(this);
+				this.handleReporterOptions = this.handleReporterOptions.bind(this);
 				this.submitTestcase = this.submitTestcase.bind(this);
+				this.runTest = this.runTest.bind(this);
 				this.onRequestTypeChange = this.onRequestTypeChange.bind(this);
-				this.onRadioChange = this.onRadioChange.bind(this);
+				this.onArrayResponseChange = this.onArrayResponseChange.bind(this);
+				this.onSaveResultsChange = this.onSaveResultsChange.bind(this);
+				this.onShowCodeChange = this.onShowCodeChange.bind(this);
 				this.toggleReportViewerModal = this.toggleReportViewerModal.bind(this);
 			}
 
 		handleGeneratorCancel = () => {
 			this.setState({generatorVisible: false});
+		}
+
+		handleRunnerCancel = () => {
+			this.setState({runnerVisible: false});
 		}
 
 		onSuccessCodeClick = () => {
@@ -75,8 +97,16 @@ class ConnectedEndpointViewer extends React.Component {
 			expectedResponseCode.value = this.props.endpoint.data.failCode;
 		}
 
-		onRadioChange = (event) => {
-			this.setState({radioOption: event.target.value});
+		onArrayResponseChange = (event) => {
+			this.setState({isArrayResponse: event.target.value});
+		}
+
+		onSaveResultsChange = (event) => {
+			this.setState({saveResults: event.target.value});
+		}
+
+		onShowCodeChange = (event) => {
+			this.setState({showCode: event.target.value});
 		}
 
 	  handleResponseParameter = (idx) => (event) => {
@@ -118,7 +148,7 @@ class ConnectedEndpointViewer extends React.Component {
 
 	  handleAddResponseProperty = () => {
 	    this.setState({
-	      expectedResponseProperties: this.state.expectedResponseProperties.concat([{ parameter: '', type: 'number', value: ''}])
+	      expectedResponseProperties: this.state.expectedResponseProperties += [{parameter: '', type: 'number', value: ''}]
 	    });
 	  }
 
@@ -145,7 +175,7 @@ class ConnectedEndpointViewer extends React.Component {
 				testcaseName: formItems.testcaseName.value,
 				testcaseInformation: {
 					expectedResponseCode: formItems.expectedResponseCode.value,
-					isArray: this.state.radioOption,
+					isArray: this.state.isArrayResponse,
 					parameters: {},
 					expectedValues: this.state.expectedResponseProperties
 				}
@@ -177,7 +207,7 @@ class ConnectedEndpointViewer extends React.Component {
 			store.set('testcases', testcases);
 
 	    //Get root and remove everything
-	    let root = document.getElementById('modalRoot');
+	    let root = document.getElementById('generatorModalRoot');
 	    root.removeChild(root.children[0]);
 
 	    //Create spinner div to center
@@ -202,6 +232,118 @@ class ConnectedEndpointViewer extends React.Component {
 
 			generateTestcases(endpoint, testcases);
 			this.handleGeneratorCancel(false);
+			this.forceUpdate();
+		}
+
+		runTest = () => {
+			let endpoint = this.props.endpoint;
+			let tef = JSON.parse(fs.readFileSync(endpoint.tefPath, 'utf8'));
+			//Save reports in a endpoint specific directory, append to path
+
+			let homeDir = new Store().get('testcase_datastorage_local');
+	    let projectDir = path.join(homeDir, endpoint.projectName);
+			let testReportsDirectory = path.join(projectDir, 'mochawesome-report', endpoint.name);
+	    let options = {
+	      cwd: projectDir
+	    }
+
+			console.log(projectDir);
+
+			let clArguments = ['node_modules/mocha/bin/mocha', '--recursive'];
+
+			if(this.state.saveResults) {
+				clArguments.push('--reporter', 'mochawesome')
+
+				if(this.state.reporterOptions.length > 0) {
+					clArguments.push('--reporter-options');
+
+					let reporterOptions = 'reportDir=' + testReportsDirectory + ',reportFileName=' + this.state.testrunName +',';
+					this.state.reporterOptions.forEach(reporterOption => {
+						switch(reporterOption) {
+							case 'hideChart':
+								console.log(reporterOption);
+								reporterOptions += 'charts=false,';
+								break;
+							case 'hideCode':
+								reporterOptions += 'code=false,';
+								break;
+							case 'autoOpen':
+								reporterOptions += 'autoOpen=true,';
+								break;
+							case 'addTimestamp':
+								reporterOptions += 'timestamp,';
+								break;
+							case 'hidePassed':
+								reporterOptions += 'showPassed=false,';
+								break;
+							case 'hideFailed':
+								reporterOptions += 'showFailed=false,';
+								break;
+							case 'showSkipped':
+								reporterOptions += 'showSkipped=true,';
+								break;
+							case 'saveJson':
+								reporterOptions += 'saveJson=true,';
+								break;
+						}
+					});
+					if(reporterOptions.endsWith(',')) {
+						reporterOptions = reporterOptions.substring(0, reporterOptions.length - 1);
+					}
+					clArguments.push(reporterOptions);
+				}
+			}
+
+			if(this.state.testToRun != 'RUN_ALL_TESTS') {
+				clArguments.push('--grep', this.state.testToRun);
+			}
+
+			console.log(clArguments);
+
+	    const child = spawn('node', clArguments, options);
+			child.stderr.on('data', function(data) {
+				console.log('STDERR data: ' + data.toString());
+			})
+
+			child.stderr.on('error', function(data) {
+				console.log('STDERR error: ' + data.toString());
+			})
+
+			child.stdout.on('data', function(data) {
+				console.log('STDOUT data: ' + data.toString());
+			})
+
+			child.stdout.on('error', function(data) {
+				console.log('STDOUT error: ' + data.toString());
+			})
+
+	    //Get root and remove everything
+	    let root = document.getElementById('runnerModalRoot');
+
+	    //Create spinner div to center
+	    let spinDiv = document.createElement('div');
+	    spinDiv.className = styles.center;
+
+	    //Create loading spinner
+	    let spinner = document.createElement('div');
+	    spinner.className = 'ant-spin ant-spin-lg ant-spin-spinning';
+
+	    //Creating the dots for the spinner
+	    let spinSpan = document.createElement('span');
+	    spinSpan.className = 'ant-spin-dot ant-spin-dot-spin';
+	    for(let i = 0; i < 4; i++) {
+	      spinSpan.appendChild(document.createElement('i'));
+	    }
+
+	    //Append loading spinner to root
+	    spinner.appendChild(spinSpan);
+	    spinDiv.appendChild(spinner);
+	    root.appendChild(spinDiv);
+
+			let toggleRunnerModal = this.toggleRunnerModal;
+			child.on('close', function(code) {
+				toggleRunnerModal(false);
+			});
 		}
 
 		onRequestTypeChange(value, option) {
@@ -209,8 +351,29 @@ class ConnectedEndpointViewer extends React.Component {
 			this.setState({requestType: requestType});
 		}
 
+		handleTestcaseSelection(value, option) {
+			let testToRun = option.props.value;
+			console.log(testToRun);
+			this.setState({testToRun: testToRun});
+		}
+
+		handleChange(event) {
+			switch(event.target.id) {
+				case 'testrunName':
+					this.setState({testrunName: event.target.value});
+			}
+		}
+
+		handleReporterOptions(value) {
+			this.setState({reporterOptions: value});
+		}
+
 		toggleReportViewerModal = (reportViewerVisible) => {
 			this.setState({reportViewerVisible});
+		}
+
+		toggleRunnerModal = (runnerVisible) => {
+			this.setState({runnerVisible});
 		}
 
 		generateClicked = (e) => {
@@ -218,12 +381,16 @@ class ConnectedEndpointViewer extends React.Component {
 				generatorVisible: true,
 				expectedResponseProperties: [{parameter: '', type: 'number', value: ''}],
 				requestType: 'GET',
-				radioOption: true
+				isArrayResponse: true
 			});
 		}
 
 		runClicked = (e) => {
-			console.log(e);
+			this.setState({
+				runnerVisible: true,
+				isArrayResponse: true,
+				testrunName: ''
+			});
 		}
 
 		viewClicked = (e) => {
@@ -245,22 +412,6 @@ class ConnectedEndpointViewer extends React.Component {
 
 		uploadClicked = (e) => {
 				console.log(e);
-		}
-
-		renderParameters(endpoint, formItemLayout) {
-			let testItems = [];
-			endpoint.data.testItems.forEach(testItem => {
-				testItems.push(
-					<Row>
-						<Col span={24}>
-							<FormItem {...formItemLayout} label={testItem.parameter + '(' + testItem.type + ')'} style={{marginRight: 6}}>
-								<Input id={testItem.parameter} type="text" />
-							</FormItem>
-						</Col>
-					</Row>
-				);
-			});
-			return testItems;
 		}
 
 		renderGenerator(endpoint) {
@@ -289,7 +440,7 @@ class ConnectedEndpointViewer extends React.Component {
 	    const typeNumber = "Number";
 
 			return(
-	      <div id="modalRoot">
+	      <div id="generatorModalRoot">
 					<div className="ant-modal-header">
 						<div className="ant-modal-title">Basic Testcase Parameters</div>
 					</div>
@@ -315,7 +466,7 @@ class ConnectedEndpointViewer extends React.Component {
 							</Col>
 							<Col span={12}>
 								<FormItem {...formItemLayoutArray} label="Array Response" style={{marginRight: 6}}>
-									<RadioGroup onChange={this.onRadioChange} value={this.state.radioOption}>
+									<RadioGroup onChange={this.onArrayResponseChange} value={this.state.isArrayResponse}>
 										<Radio value={true}>yes</Radio>
 										<Radio value={false}>no</Radio>
 									</RadioGroup>
@@ -370,7 +521,168 @@ class ConnectedEndpointViewer extends React.Component {
 						))}
 					</Form>
 	      </div>
-			)
+			);
+		}
+
+		renderParameters(endpoint, formItemLayout) {
+			let testItems = [];
+			endpoint.data.testItems.forEach(testItem => {
+				testItems.push(
+					<Row>
+						<Col span={24}>
+							<FormItem {...formItemLayout} label={testItem.parameter + '(' + testItem.type + ')'} style={{marginRight: 6}}>
+								<Input id={testItem.parameter} type="text" />
+							</FormItem>
+						</Col>
+					</Row>
+				);
+			});
+			return testItems;
+		}
+
+		renderRunner(endpoint) {
+			const formItemLayout = {
+				labelCol: { span: 6 },
+				wrapperCol: { span: 18 }
+			};
+
+			return(
+				<div id="runnerModalRoot">
+					<div className="ant-modal-header">
+						<div className="ant-modal-title">Run Options</div>
+					</div>
+					<br />
+					<Form id="runnerForm">
+						<Row>
+							<Col span={24}>
+								<FormItem {...formItemLayout} label="Test to Run" style={{marginRight: 6}}>
+									<Select
+										showArrow
+										showSearch
+										placeholder="Select a Test"
+										optionFilterProp="children"
+										onChange={this.handleTestcaseSelection}
+										filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+									>
+										{this.renderOptions(endpoint)}
+									</Select>
+								</FormItem>
+							</Col>
+						</Row>
+						<Row>
+							<Col span={24}>
+								<FormItem {...formItemLayout} label="Save Results">
+									<RadioGroup onChange={this.onSaveResultsChange} value={this.state.saveResults}>
+										<Radio value={true}>yes</Radio>
+										<Radio value={false}>no</Radio>
+									</RadioGroup>
+								</FormItem>
+							</Col>
+						</Row>
+					</Form>
+					<div className="ant-modal-header">
+						<div className="ant-modal-title">Reporter Options</div>
+					</div>
+					<br />
+					<Form id="reporterForm">
+						<Row>
+							<Col span={24}>
+								<FormItem {...formItemLayout} label="Testrun Name" style={{marginRight: 6}}>
+									<Input id="testrunName" type="text" value={this.state.testrunName} onChange={this.handleChange} disabled={!this.state.saveResults}/>
+								</FormItem>
+							</Col>
+						</Row>
+						<Row>
+							<Col span={24}>
+								<Select
+									showSearch
+									optionFilterProp="children"
+									mode="multiple"
+									placeholder="Additional Options"
+									onChange={this.handleReporterOptions}
+									filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+									disabled={!this.state.saveResults}
+								>
+									<Option key="hideChart" value="hideChart">Hide Charts</Option>
+									<Option key="hideCode" value="hideCode">Hide Code</Option>
+									<Option key="autoOpen" value="autoOpen">Open After Run</Option>
+									<Option key="addTimestamp" value="addTimestamp">Add ISO Timestamp to Name</Option>
+									<Option key="hidePassed" value="hidePassed">Hide Passed</Option>
+									<Option key="hideFailed" value="hideFailed">Hide Failed</Option>
+									<Option key="showSkipped" value="showSkipped">Show Skipped</Option>
+									<Option key="saveJson" value="saveJson">Save JSON</Option>
+								</Select>
+							</Col>
+						</Row>
+					</Form>
+				</div>
+			);
+		}
+
+		renderOptions(endpoint) {
+			let endpointName = endpoint.name.replace(new RegExp('&', 'g'), '/');
+			let tef = JSON.parse(fs.readFileSync(endpoint.tefPath, 'utf8'));
+			let testcases = tef.testcases;
+
+			let gets = ['GET', 'GET ' + endpointName];
+			let posts = ['POST', 'POST ' + endpointName];
+			let puts = ['PUT', 'PUT ' + endpointName];
+			let deletes = ['DELETE', 'DELETE ' + endpointName];
+
+			testcases.forEach(testcase => {
+				switch(testcase.testcaseInformation.requestType) {
+					case 'GET':
+						gets.push(testcase.testcaseName);
+						break;
+					case 'POST':
+						posts.push(testcase.testcaseName);
+						break;
+					case 'PUT':
+						puts.push(testcase.testcaseName);
+						break;
+					case 'DELETE':
+						deletes.push(testcase.testcaseName);
+						break;
+				}
+			});
+
+			let options = [];
+
+			options.push(
+				<OptGroup label="All">
+					<Option value="RUN_ALL_TESTS">All</Option>
+				</OptGroup>
+			);
+			if(gets.length != 2) {
+				options.push(
+					<OptGroup label="GET">
+						{gets.map((testcase) => <Option key={testcase} value={testcase}>{testcase}</Option>)}
+					</OptGroup>
+				);
+			}
+			if(posts.length != 2) {
+				options.push(
+					<OptGroup label="POST">
+						{posts.map((testcase) => <Option key={testcase} value={testcase}>{testcase}</Option>)}
+					</OptGroup>
+				);
+			}
+			if(puts.length != 2) {
+				options.push(
+					<OptGroup label="PUT">
+						{puts.map((testcase) => <Option key={testcase} value={testcase}>{testcase}</Option>)}
+					</OptGroup>
+				);
+			}
+			if(deletes.length != 2) {
+				options.push(
+					<OptGroup label="DELETE">
+						{deletes.map((testcase) => <Option key={testcase} value={testcase}>{testcase}</Option>)}
+					</OptGroup>
+				);
+			}
+
+			return options;
 		}
 
 		render() {
@@ -400,7 +712,7 @@ class ConnectedEndpointViewer extends React.Component {
 													bodyStyle={{ bodyStyle }}
 													onOk={this.submitTestcase}
 													onCancel={this.handleGeneratorCancel}
-													destroyOnClose = {true}
+													destroyOnClose={true}
 													width='80%'
 													footer={[
 														<Button key="add" onClick={this.handleAddResponseProperty}>Add Response Property</Button>,
@@ -416,6 +728,22 @@ class ConnectedEndpointViewer extends React.Component {
 									<Divider style={{margin: "2px 8px 2px 8px" }}type='vertical'></Divider>
 									<ButtonGroup size="small">
 											<Button type="primary" size="small" onClick={this.runClicked}>Run</Button>
+											<Modal
+												title="Test Runner"
+												style={{ top: 20 }}
+												visible={this.state.runnerVisible}
+												bodyStyle={{ bodyStyle }}
+												onOk={this.runTest}
+												onCancel={this.handleRunnerCancel}
+												destroyOnClose={true}
+												width='60%'
+												footer={[
+													<Button key="back" onClick={this.handleRunnerCancel}>Cancel</Button>,
+													<Button key="run" onClick={this.runTest}>Run</Button>
+												]}
+											>
+												{this.renderRunner(endpoint)}
+											</Modal>
 											<Button size="small" onClick={this.viewClicked}>View</Button>
 											<Modal
 													title="Report Viewer"
