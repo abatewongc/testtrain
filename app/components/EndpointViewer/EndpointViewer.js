@@ -16,6 +16,7 @@ const ButtonGroup = Button.Group;
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const OptGroup = Select.OptGroup;
+var rimraf = require('rimraf');
 
 const mapStateToProps = state => {
 		return {
@@ -407,7 +408,17 @@ class ConnectedEndpointViewer extends React.Component {
 
 		deleteClicked = (e) => {
 				e.preventDefault();
+				let endpoint = this.props.endpoint;
+				try {
+					let tefPath = endpoint.tefPath;
+					let endpointPath = path.join(endpoint.tefPath, "../")
+					rimraf.sync(endpointPath);
+				} catch(error) {
+					// ignore this cuz im lazy and this isn't an enterprise app
+				}
+
 				this.props.clearEndpoint({endpoint});
+
 		}
 
 		uploadClicked = (e) => {
