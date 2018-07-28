@@ -90,13 +90,21 @@ const generateTestcases = function(endpoint, testcases) {
 	}
 }
 
+const generateQuery = function(parameters) {
+	let query = {};
+	parameters.forEach(parameter => {
+		query[parameter.parameter] = parameter.value;
+	});
+	return query;
+}
+
 const generateRequestTestcases = function(requestTests, endpoint, type, server) {
 	let testcaseStrings = '';
 	for(let i = 0; i < requestTests.length; i++) {
 		let testcase = requestTests[i];
 		let testcaseName = testcase.testcaseName;
 		let expectedResponseCode = testcase.testcaseInformation.expectedResponseCode;
-		let query = JSON.stringify(testcase.testcaseInformation.parameters);
+		let query = JSON.stringify(generateQuery(testcase.testcaseInformation.parameters));
 		let isArray = testcase.testcaseInformation.isArray;
 		let expectedValues = testcase.testcaseInformation.expectedValues;
 
