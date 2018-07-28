@@ -109,7 +109,7 @@ class ConnectedTestcase extends React.Component {
 						</Content>
 						<Sider theme="light" width="36px" style={{ borderLeft: '1px solid #F1F2F6'  }}>
 						<div style={buttonContainerStyle}>
-							<Button style={buttonStyle} onClick={this.handleEditClicked} type="default" shape="circle" icon="edit" size="small" />
+							<Button style={buttonStyle} onClick={this.handleEditClicked} type="default" shape="circle" icon="sync" size="small" />
 							<Button style={buttonStyle} onClick={this.handleDeleteClicked} type="default" shape="circle" icon="delete" size="small" />
 						</div>
 						</Sider>
