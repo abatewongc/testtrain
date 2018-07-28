@@ -91,7 +91,7 @@ const generateTestcases = function(endpoint, testcases) {
 }
 
 const generateRequestTestcases = function(requestTests, endpoint, type, server) {
-	let testcaseStrings;
+	let testcaseStrings = '';
 	for(let i = 0; i < requestTests.length; i++) {
 		let testcase = requestTests[i];
 		let testcaseName = testcase.testcaseName;
@@ -112,7 +112,6 @@ const generateRequestTestcases = function(requestTests, endpoint, type, server) 
 
 		let valueChecks = '';
 		for(let j = 0; j < expectedValues.length; j++) {
-			console.log(expectedValues);
 			let parameter = expectedValues[j].parameter;
 			let type = expectedValues[j].type;
 			let value = expectedValues[j].value;

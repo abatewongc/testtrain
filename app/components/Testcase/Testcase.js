@@ -34,30 +34,19 @@ class ConnectedTestcase extends React.Component {
 
 		this.state = {
 			key: props.key,
+			disabled: true
 		};
 
 
 		this.handleChange = this.handleChange.bind(this);
-		this.handleBlur = this.handleBlur.bind(this);
-		this.handleFocus = this.handleFocus.bind(this);
-		this.renderInputs = this.renderInputs.bind(this);
+		this.renderParameters = this.renderParameters.bind(this);
 		this.renderOutputs = this.renderOutputs.bind(this);
 		this.handleEditClicked = this.handleEditClicked.bind(this);
 		this.handleDeleteClicked = this.handleDeleteClicked.bind(this);
-		this.handleRefreshClicked = this.handleRefreshClicked.bind(this);
-
 	}
 
 	handleChange(value) {
 		console.log(`selected ${value}`);
-	}
-
-	handleBlur() {
-		console.log('blur');
-	}
-
-	handleFocus() {
-		console.log('focus');
 	}
 
 	handleEditClicked = (e) => {
@@ -68,19 +57,15 @@ class ConnectedTestcase extends React.Component {
 		console.log('delete ' + this.props.uuid + ' clicked');
 	}
 
-	handleRefreshClicked = (e) => {
-		console.log('refresh ' + this.props.uuid + ' clicked');
-	}
-
-	renderInputs(testcase) {
+	renderParameters(testcase) {
 		return(
-			<Table dataSource={testcase.inputs} columns={columns} pagination={false} />
+			<Table dataSource={testcase.parameters} columns={columns} pagination={false} />
 		);
 	}
 
 	renderOutputs(testcase) {
 		return(
-			<Table dataSource={testcase.outputs} columns={columns} pagination={false} />
+			<Table dataSource={testcase.expectedValues} columns={columns} pagination={false} />
 		);
 	}
 
@@ -91,41 +76,32 @@ class ConnectedTestcase extends React.Component {
 				<div style={style}>
 					<Layout style={{ backgroundColor: '#FFFFFF', padding: "0px 0px 0px 0px"}} hasSider="true">
 						<Content style={{ backgroundColor: '#FFFFFF', padding: "0px 0px 0px 0px"}}>
-						<Divider style={dividerStyle} orientation="left" >Request Type | Success | Failure</Divider>
+						<Divider style={dividerStyle} orientation="left" >Request Type | Expected Response Code</Divider>
 						  <Select
-							showSearch
-							style={{ width: 120 }}
-							placeholder="Select a request type"
-							optionFilterProp="children"
-							onChange={this.handleChange}
-							onFocus={this.handleFocus}
-							onBlur={this.handleBlur}
-							defaultValue="POST"
-							filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+								showSearch
+								style={{ width: 120 }}
+								placeholder="Select a request type"
+								optionFilterProp="children"
+								onChange={this.handleChange}
+								defaultValue={testcase.requestType}
+								filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+								disabled={this.state.disabled}
 						  >
-							<Option value="POST">POST</Option>
-							<Option value="GET">GET</Option>
-							<Option value="PUT">PUT</Option>
-							<Option value="PATCH">PATCH</Option>
-							<Option value="DELETE">DELETE</Option>
+								<Option value="POST">POST</Option>
+								<Option value="GET">GET</Option>
+								<Option value="PUT">PUT</Option>
+								<Option value="PATCH">PATCH</Option>
+								<Option value="DELETE">DELETE</Option>
 						  </Select>
 						  <Divider type='vertical'></Divider>
-						  <InputNumber min={1} max={1000} disabled={this.state.disabled} defaultValue={testcase.success} />
-						  <Divider type='vertical' ></Divider>
-						  <InputNumber min={1} max={1000} disabled={this.state.disabled} defaultValue={testcase.fail} />
+						  <InputNumber min={1} max={1000} disabled={this.state.disabled} defaultValue={testcase.expectedResponseCode} />
 						  <Divider type='vertical'></Divider>
-						  <Tooltip style={toolTipStyle} title="Total Successes">
-							<Tag color="green">{testcase.num_successes}</Tag>
-						  </Tooltip>
-						  <Tooltip style={toolTipStyle} title="Total Runs">
-							<Tag color="purple">{testcase.num_runs}</Tag>
-						  </Tooltip>
 						  <Divider style={dividerStyle} orientation="left" ></Divider>
 						  <Collapse bordered={false}>
-							<Panel header="Inputs">
-								{this.renderInputs(testcase)}
+							<Panel header="Query Parameters">
+								{this.renderParameters(testcase)}
 							</Panel>
-							<Panel header="Outputs">
+							<Panel header="Expected Values">
 								{this.renderOutputs(testcase)}
 							</Panel>
 						  </Collapse>
@@ -135,7 +111,6 @@ class ConnectedTestcase extends React.Component {
 						<div style={buttonContainerStyle}>
 							<Button style={buttonStyle} onClick={this.handleEditClicked} type="default" shape="circle" icon="edit" size="small" />
 							<Button style={buttonStyle} onClick={this.handleDeleteClicked} type="default" shape="circle" icon="delete" size="small" />
-							<Button style={buttonStyle} onClick={this.handleRefreshClicked} type="default" shape="circle" icon="sync" size="small" />
 						</div>
 						</Sider>
 					</Layout>

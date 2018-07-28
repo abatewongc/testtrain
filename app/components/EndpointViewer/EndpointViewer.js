@@ -49,7 +49,7 @@ class ConnectedEndpointViewer extends React.Component {
 					showCode: false,
 					reporterOptions: [],
 					disableForms: false,
-					expectedResponseProperties: [{parameter: '', type: 'number', value: ''}]
+					expectedResponseProperties: [{parameter: '', type: 'Number', value: ''}]
 				};
 
 				this.generateClicked = this.generateClicked.bind(this);
@@ -147,8 +147,10 @@ class ConnectedEndpointViewer extends React.Component {
 	  }
 
 	  handleAddResponseProperty = () => {
+			let newArray = this.state.expectedResponseProperties;
+			newArray.push({parameter: '', type: 'Number', value: ''});
 	    this.setState({
-	      expectedResponseProperties: this.state.expectedResponseProperties += [{parameter: '', type: 'number', value: ''}]
+	      expectedResponseProperties: newArray
 	    });
 	  }
 
@@ -176,7 +178,7 @@ class ConnectedEndpointViewer extends React.Component {
 				testcaseInformation: {
 					expectedResponseCode: formItems.expectedResponseCode.value,
 					isArray: this.state.isArrayResponse,
-					parameters: {},
+					parameters: [],
 					expectedValues: this.state.expectedResponseProperties
 				}
 			}
@@ -189,7 +191,14 @@ class ConnectedEndpointViewer extends React.Component {
 				let id = formItems[i].id;
 				let value = formItems[i].value;
 				if(id != 'testcaseName' && id != 'expectedResponseCode' && id && value) {
-					testcase.testcaseInformation.parameters[id] = value;
+					let parameter = {};
+					tef.testItems.forEach(testItem => {
+						if(testItem.parameter == id) {
+							parameter = testItem;
+						}
+					});
+					parameter.value = value;
+					testcase.testcaseInformation.parameters.push(parameter);
 				}
 			}
 
@@ -247,8 +256,6 @@ class ConnectedEndpointViewer extends React.Component {
 	      cwd: projectDir
 	    }
 
-			console.log(projectDir);
-
 			let clArguments = ['node_modules/mocha/bin/mocha', '--recursive'];
 
 			if(this.state.saveResults) {
@@ -297,25 +304,6 @@ class ConnectedEndpointViewer extends React.Component {
 			if(this.state.testToRun != 'RUN_ALL_TESTS') {
 				clArguments.push('--grep', this.state.testToRun);
 			}
-
-			console.log(clArguments);
-
-	    const child = spawn('node', clArguments, options);
-			child.stderr.on('data', function(data) {
-				console.log('STDERR data: ' + data.toString());
-			})
-
-			child.stderr.on('error', function(data) {
-				console.log('STDERR error: ' + data.toString());
-			})
-
-			child.stdout.on('data', function(data) {
-				console.log('STDOUT data: ' + data.toString());
-			})
-
-			child.stdout.on('error', function(data) {
-				console.log('STDOUT error: ' + data.toString());
-			})
 
 	    //Get root and remove everything
 	    let root = document.getElementById('runnerModalRoot');
