@@ -131,7 +131,7 @@ class ConnectedTestProjectViewer extends React.Component {
 
   renderEndpoint() {
     if(this.state.current_endpoint) {
-      return <Panel header="Endpoint Information" style={endpointInfoPanelStyle} className="testcase_panel" key="endpoint-info-panel">{this.renderEndpointData()}</Panel>
+      return <Panel header="Endpoint Information" style={endpointInfoPanelStyle} key="endpoint-info-panel">{this.renderEndpointData()}</Panel>
     }
   }
 
