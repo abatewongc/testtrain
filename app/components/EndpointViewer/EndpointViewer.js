@@ -305,6 +305,8 @@ class ConnectedEndpointViewer extends React.Component {
 				clArguments.push('--grep', this.state.testToRun);
 			}
 
+			let child = spawn('node', clArguments, options);
+
 	    //Get root and remove everything
 	    let root = document.getElementById('runnerModalRoot');
 
