@@ -17,6 +17,7 @@ const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const OptGroup = Select.OptGroup;
 var rimraf = require('rimraf');
+const remote = require('electron').remote;
 
 const mapStateToProps = state => {
 		return {
@@ -79,6 +80,7 @@ class ConnectedEndpointViewer extends React.Component {
 				this.onSaveResultsChange = this.onSaveResultsChange.bind(this);
 				this.onShowCodeChange = this.onShowCodeChange.bind(this);
 				this.toggleReportViewerModal = this.toggleReportViewerModal.bind(this);
+				this.handleNullSelectionButtonClick = this.handleNullSelectionButtonClick.bind(this);
 			}
 
 		handleGeneratorCancel = () => {
@@ -399,6 +401,11 @@ class ConnectedEndpointViewer extends React.Component {
 				}
 		}
 
+		handleNullSelectionButtonClick = (e) => {
+			let browserWindow = remote.getCurrentWindow()
+			browserWindow.emit('add-new-endpoint');
+		}
+
 		deleteClicked = (e) => {
 				e.preventDefault();
 				let endpoint = this.props.endpoint;
@@ -699,7 +706,17 @@ class ConnectedEndpointViewer extends React.Component {
 				if(disabled) {
 					return (
 						<div>
-							<div>You have nothing selected. (mongoloid)</div>
+							<div>
+							<Button
+                			    type="primary"
+                			    icon="plus"
+                			    size="default"
+								onClick={this.handleNullSelectionButtonClick}
+								disabled={false}
+							>
+								Make New Endpoint
+							</Button>
+							</div>
 						</div>
 					)
 				} else {
