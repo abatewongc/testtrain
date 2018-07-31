@@ -1,9 +1,0 @@
-
-<Col span={12}>
-  <FormItem {...formItemOptionsLayout} label="Show Code" style={{marginRight: 6}}>
-    <RadioGroup onChange={this.onShowCodeChange} value={this.state.showCode}>
-      <Radio value={true}>yes</Radio>
-      <Radio value={false}>no</Radio>
-    </RadioGroup>
-  </FormItem>
-</Col>
