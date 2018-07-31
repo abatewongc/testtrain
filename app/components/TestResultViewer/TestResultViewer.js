@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { Spin, Button, Select, Option  } from 'antd';
+import { Spin, Button, Select } from 'antd';
 import paths from 'path';
 var fs = require('fs');
+const Option = Select.Option;
 
 
 const mapStateToProps = state => {
@@ -24,50 +25,67 @@ class ConnectedTestResultViewer extends React.Component {
 
         this.state = {
             reportPath: '',
+            currentlySelectedReport: '',
             reportIsLoaded: false,
-            report: '',
+            reports: [],
         }
 
+        this.handleSelectionChange = this.handleSelectionChange.bind(this);
         this.handleButtonClick = this.handleButtonClick.bind(this);
     }
 
     handleButtonClick = () => {
-        console.log(this.state.reportPath);
-        require('electron').shell.openExternal(this.state.reportPath);
+        require('electron').shell.openExternal(this.state.currentlySelectedReport);
+    }
+    handleSelectionChange = (value) => {
+        this.setState({currentlySelectedReport: value})
     }
 
     componentDidMount() {
-        let { tefPath } = this.props.endpoint;
+        this.setState({ currentlySelectedReport: '' })
+        let { tefPath, name } = this.props.endpoint;
         // this is called every time the modal is opened, so we can find the latest report and load it now
         // the latest report is located in a subdirectory on the same level...
-        console.log(tefPath)
-        let reportPath = paths.join(tefPath, "../../../mochawesome-report/latest.html");
-        console.log(reportPath);
+        let reportPath = paths.join(tefPath, "../../../mochawesome-report/", name );
         this.setState({ reportPath });
-        fs.readFile(reportPath, 'utf-8', (err, data) => {
-            if(!err) {
-                this.setState({ reportIsLoaded: true });
-            }
+        let tempreports = fs.readdirSync(reportPath);
+        let reports = [];
+        tempreports = tempreports.filter(el => /\.html$/.test(el))
+        tempreports.forEach(element => {
+            reports.push({
+                name: element,
+                fullpath: paths.join(reportPath, element),
+            })
         });
+
+        console.log(reports);
+        if(reports.length > 0) {
+            this.setState({ reportIsLoaded: true })
+        }
+        this.setState({ reports })
+
+
+
     }
 
 
 	render() {
 
-                const { report } = this.state;
-                const html = { __html: report };
+                const { reports } = this.state;
                 return(
                     <div style={{ textAlign: 'center' }}>
                     <Select
                         style={{ width: '60%' }}
-
+                        onChange={this.handleSelectionChange}
                     >
-
+                        {
+                            reports.map((report) => <Option key={report.name} value={report.fullpath}>{report.name}</Option>)
+                        }
                     </Select>
                     <Button
                     type="primary"
-                    icon="plus"
-                    size="upload"
+                    icon="upload"
+                    size="default"
                     onClick={this.handleButtonClick}
                     disabled={!this.state.reportIsLoaded}
                     >
