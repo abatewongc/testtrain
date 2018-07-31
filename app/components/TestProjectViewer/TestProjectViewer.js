@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { Layout, Menu, Icon, Divider, Collapse } from 'antd';
 import { connect } from "react-redux";
-const { Header, Content, Footer, Sider } = Layout;
-import EndpointViewer from '../EndpointViewer/EndpointViewer'
 import { Z_FIXED } from 'zlib';
 import { inherits } from 'util';
-import { loadEndpoint, editEndpoint } from "../../actions/endpoint-viewer";
+import { loadEndpoint, editEndpoint, updateTestcases } from "../../actions/endpoint-viewer";
+import EndpointViewer from '../EndpointViewer/EndpointViewer'
 import styles from './TestProjectViewer.css';
 import paths from 'path'
+import { store } from '../../store/configureStore.js'
+const { Header, Content, Footer, Sider } = Layout;
 const Panel = Collapse.Panel;
 const Store = require('electron-store');
 const fs = require('fs');
@@ -17,14 +18,16 @@ import Testcase from '../Testcase/Testcase'
 const mapStateToProps = state => {
     return {
       endpoint: state.current_endpoint_reducer.current_endpoint.endpoint,
-      edit: state.current_endpoint_reducer.edit_endpoint
+      edit: state.current_endpoint_reducer.edit_endpoint,
+      updateTestcases: state.current_endpoint_reducer.update_testcases
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
       loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
-      editEndpoint: edit => dispatch(editEndpoint(edit))
+      editEndpoint: edit => dispatch(editEndpoint(edit)),
+      updateTestcases: updateTestcases => dispatch(updateTestcases(updateTestcases))
     };
 };
 
@@ -39,6 +42,7 @@ class ConnectedTestProjectViewer extends React.Component {
         tefPath: '',
 	      disabled: true,
 	    },
+      updateTestcases: false,
       edit: false,
 	    cases: [],
       theme: 'light'
@@ -66,7 +70,6 @@ class ConnectedTestProjectViewer extends React.Component {
   }
 
 	 createTestCaseObject(testcase) {
-     console.log(testcase.testcaseInformation.expectedResponseCode);
      let testcaseObject = {
        name: testcase.testcaseName,
        expectedResponseCode: testcase.testcaseInformation.expectedResponseCode,
@@ -219,6 +222,9 @@ class ConnectedTestProjectViewer extends React.Component {
   }
 
 	render() {
+    store.subscribe(() => {
+      console.log(store.getState());
+    });
     this.state.current_endpoint = this.props.endpoint;
     this.state.edit = this.props.edit;
 		return (
