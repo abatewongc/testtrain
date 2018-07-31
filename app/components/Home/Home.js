@@ -14,7 +14,6 @@ type Props = {};
 const ElectronStore = require('electron-store');
 const localstore = new ElectronStore();
 const directory = localstore.get('testcase_datastorage_local');
-console.log(directory)
 
 export default class Home extends Component<Props> {
 	props: Props;

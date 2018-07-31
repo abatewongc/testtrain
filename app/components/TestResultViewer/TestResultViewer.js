@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { Spin, Button } from 'antd';
+import { Spin, Button, Select, Option  } from 'antd';
 import paths from 'path';
 var fs = require('fs');
 
@@ -40,6 +40,7 @@ class ConnectedTestResultViewer extends React.Component {
         let { tefPath } = this.props.endpoint;
         // this is called every time the modal is opened, so we can find the latest report and load it now
         // the latest report is located in a subdirectory on the same level...
+        console.log(tefPath)
         let reportPath = paths.join(tefPath, "../../../mochawesome-report/latest.html");
         console.log(reportPath);
         this.setState({ reportPath });
@@ -56,14 +57,20 @@ class ConnectedTestResultViewer extends React.Component {
                 const { report } = this.state;
                 const html = { __html: report };
                 return(
-                    <div style={{ textAlign: 'center' }}><Button
+                    <div style={{ textAlign: 'center' }}>
+                    <Select
+                        style={{ width: '60%' }}
+
+                    >
+
+                    </Select>
+                    <Button
                     type="primary"
                     icon="plus"
-                    size="default"
+                    size="upload"
                     onClick={this.handleButtonClick}
                     disabled={!this.state.reportIsLoaded}
                     >
-                        View in Browser
                     </Button></div>
                 );
 
