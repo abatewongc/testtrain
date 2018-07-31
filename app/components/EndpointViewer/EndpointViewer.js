@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Divider, Button, Modal, Form, Row, Input, Col, Select, Radio } from 'antd';
 import { connect } from "react-redux";
-import { loadEndpoint, clearEndpoint, editEndpoint } from "../../actions/endpoint-viewer";
+import { loadEndpoint, clearEndpoint, editEndpoint, updateTestcases } from "../../actions/endpoint-viewer";
 import MenuBuilder from '../../menu.js';
 import TestResultViewer from '../TestResultViewer/TestResultViewer';
 import styles from './EndpointViewer.css';
@@ -28,7 +28,8 @@ const mapDispatchToProps = dispatch => {
 		return {
 			loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
 			clearEndpoint: endpoint => dispatch(clearEndpoint(endpoint)),
-			editEndpoint: edit => dispatch(editEndpoint(edit))
+			editEndpoint: edit => dispatch(editEndpoint(edit)),
+			updateTestcases: update => dispatch(updateTestcases(update))
 		};
 };
 
@@ -49,7 +50,7 @@ class ConnectedEndpointViewer extends React.Component {
 					showCode: false,
 					reporterOptions: [],
 					disableForms: false,
-					expectedResponseProperties: [{parameter: '', type: 'number', value: ''}]
+					expectedResponseProperties: [{parameter: '', type: 'Number', value: ''}]
 				};
 
 				this.generateClicked = this.generateClicked.bind(this);
@@ -147,8 +148,10 @@ class ConnectedEndpointViewer extends React.Component {
 	  }
 
 	  handleAddResponseProperty = () => {
+			let newArray = this.state.expectedResponseProperties;
+			newArray.push({parameter: '', type: 'Number', value: ''});
 	    this.setState({
-	      expectedResponseProperties: this.state.expectedResponseProperties += [{parameter: '', type: 'number', value: ''}]
+	      expectedResponseProperties: newArray
 	    });
 	  }
 
@@ -176,7 +179,7 @@ class ConnectedEndpointViewer extends React.Component {
 				testcaseInformation: {
 					expectedResponseCode: formItems.expectedResponseCode.value,
 					isArray: this.state.isArrayResponse,
-					parameters: {},
+					parameters: [],
 					expectedValues: this.state.expectedResponseProperties
 				}
 			}
@@ -189,7 +192,14 @@ class ConnectedEndpointViewer extends React.Component {
 				let id = formItems[i].id;
 				let value = formItems[i].value;
 				if(id != 'testcaseName' && id != 'expectedResponseCode' && id && value) {
-					testcase.testcaseInformation.parameters[id] = value;
+					let parameter = {};
+					tef.testItems.forEach(testItem => {
+						if(testItem.parameter == id) {
+							parameter = testItem;
+						}
+					});
+					parameter.value = value;
+					testcase.testcaseInformation.parameters.push(parameter);
 				}
 			}
 
@@ -231,6 +241,8 @@ class ConnectedEndpointViewer extends React.Component {
 	    root.appendChild(spinDiv);
 
 			generateTestcases(endpoint, testcases);
+
+			this.props.updateTestcases(true);
 			this.handleGeneratorCancel(false);
 			this.forceUpdate();
 		}
@@ -246,8 +258,6 @@ class ConnectedEndpointViewer extends React.Component {
 	    let options = {
 	      cwd: projectDir
 	    }
-
-			console.log(projectDir);
 
 			let clArguments = ['node_modules/mocha/bin/mocha', '--recursive'];
 
@@ -298,24 +308,7 @@ class ConnectedEndpointViewer extends React.Component {
 				clArguments.push('--grep', this.state.testToRun);
 			}
 
-			console.log(clArguments);
-
-	    const child = spawn('node', clArguments, options);
-			child.stderr.on('data', function(data) {
-				console.log('STDERR data: ' + data.toString());
-			})
-
-			child.stderr.on('error', function(data) {
-				console.log('STDERR error: ' + data.toString());
-			})
-
-			child.stdout.on('data', function(data) {
-				console.log('STDOUT data: ' + data.toString());
-			})
-
-			child.stdout.on('error', function(data) {
-				console.log('STDOUT error: ' + data.toString());
-			})
+			let child = spawn('node', clArguments, options);
 
 	    //Get root and remove everything
 	    let root = document.getElementById('runnerModalRoot');
@@ -656,28 +649,28 @@ class ConnectedEndpointViewer extends React.Component {
 			if(gets.length != 2) {
 				options.push(
 					<OptGroup label="GET">
-						{gets.map((testcase) => <Option key={testcase} value={testcase}>{testcase}</Option>)}
+						{gets.map((testcase) => <Option key={testcase.testcaseName} value={testcase}>{testcase}</Option>)}
 					</OptGroup>
 				);
 			}
 			if(posts.length != 2) {
 				options.push(
 					<OptGroup label="POST">
-						{posts.map((testcase) => <Option key={testcase} value={testcase}>{testcase}</Option>)}
+						{posts.map((testcase) => <Option key={testcase.testcaseName} value={testcase}>{testcase}</Option>)}
 					</OptGroup>
 				);
 			}
 			if(puts.length != 2) {
 				options.push(
 					<OptGroup label="PUT">
-						{puts.map((testcase) => <Option key={testcase} value={testcase}>{testcase}</Option>)}
+						{puts.map((testcase) => <Option key={testcase.testcaseName} value={testcase}>{testcase}</Option>)}
 					</OptGroup>
 				);
 			}
 			if(deletes.length != 2) {
 				options.push(
 					<OptGroup label="DELETE">
-						{deletes.map((testcase) => <Option key={testcase} value={testcase}>{testcase}</Option>)}
+						{deletes.map((testcase) => <Option key={testcase.testcaseName} value={testcase}>{testcase}</Option>)}
 					</OptGroup>
 				);
 			}
@@ -715,9 +708,9 @@ class ConnectedEndpointViewer extends React.Component {
 													destroyOnClose={true}
 													width='80%'
 													footer={[
-														<Button key="add" onClick={this.handleAddResponseProperty}>Add Response Property</Button>,
-														<Button key="back" onClick={this.handleGeneratorCancel}>Cancel</Button>,
-														<Button key="submit" onClick={this.submitTestcase}>Submit</Button>
+														<Button key="addResponseProperty" onClick={this.handleAddResponseProperty}>Add Response Property</Button>,
+														<Button key="exitGenerator" onClick={this.handleGeneratorCancel}>Cancel</Button>,
+														<Button key="submitTestcase" onClick={this.submitTestcase}>Submit</Button>
 													]}
 												>
 													{this.renderGenerator(endpoint)}
@@ -738,7 +731,7 @@ class ConnectedEndpointViewer extends React.Component {
 												destroyOnClose={true}
 												width='60%'
 												footer={[
-													<Button key="back" onClick={this.handleRunnerCancel}>Cancel</Button>,
+													<Button key="exitRunner" onClick={this.handleRunnerCancel}>Cancel</Button>,
 													<Button key="run" onClick={this.runTest}>Run</Button>
 												]}
 											>

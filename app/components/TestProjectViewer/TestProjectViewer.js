@@ -1,30 +1,33 @@
 import React, { Component } from 'react';
-import { Layout, Menu, Icon, Divider } from 'antd';
+import { Layout, Menu, Icon, Divider, Collapse } from 'antd';
 import { connect } from "react-redux";
-const { Header, Content, Footer, Sider } = Layout;
-import EndpointViewer from '../EndpointViewer/EndpointViewer'
 import { Z_FIXED } from 'zlib';
 import { inherits } from 'util';
-import { loadEndpoint, editEndpoint } from "../../actions/endpoint-viewer";
+import { loadEndpoint, editEndpoint, updateTestcases } from "../../actions/endpoint-viewer";
+import EndpointViewer from '../EndpointViewer/EndpointViewer'
 import styles from './TestProjectViewer.css';
-import { Collapse } from 'antd';
-const Panel = Collapse.Panel;
 import paths from 'path'
+import { store } from '../../store/configureStore.js'
+const { Header, Content, Footer, Sider } = Layout;
+const Panel = Collapse.Panel;
 const Store = require('electron-store');
+const fs = require('fs');
 
 import Testcase from '../Testcase/Testcase'
 
 const mapStateToProps = state => {
     return {
       endpoint: state.current_endpoint_reducer.current_endpoint.endpoint,
-      edit: state.current_endpoint_reducer.edit_endpoint
+      edit: state.current_endpoint_reducer.edit_endpoint,
+      updateTestcases: state.current_endpoint_reducer.update_testcases
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
       loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
-      editEndpoint: edit => dispatch(editEndpoint(edit))
+      editEndpoint: edit => dispatch(editEndpoint(edit)),
+      updateTestcases: updateTestcases => dispatch(updateTestcases(updateTestcases))
     };
 };
 
@@ -39,6 +42,7 @@ class ConnectedTestProjectViewer extends React.Component {
         tefPath: '',
 	      disabled: true,
 	    },
+      updateTestcases: false,
       edit: false,
 	    cases: [],
       theme: 'light'
@@ -65,71 +69,28 @@ class ConnectedTestProjectViewer extends React.Component {
     this.forceUpdate();
   }
 
-	 createTestCaseObject(endpoint) {
-  		// ************************************************************** */
-  		// THIS IS WHERE WE WOULD GET THE DATA FROM THE TEF
-  		// ANY HARDCODED DATA IN THIS METHOD WOULD BE EXTRACTED IN THIS BLOCK
-  		// let _name = 'experimental'
-  		// ************************************************************** */
-  		let testcase = {
-			name: _name,
-			fullurl: paths.join(endpoint.name.replace(new RegExp('&', 'g'), '/'), '/', _name),
-			success: endpoint.data.successCode,
-      fail: endpoint.data.failCode,
-      num_runs: 1000,
-      num_successes: 998,
-		  outputs: [
-				{
-          key: "1",
-          parameter: "1",
-          type: "string",
-          value: "bye",
-				},
-				{
-          key: "2",
-          parameter: "2",
-          type: "integer",
-          value: "2",
-				},
-				{
-          key: "1",
-          parameter: "3",
-          type: "boolean",
-          value: "true",
-				}
-			],
-			inputs: [
-				{
-          key: "1",
-					parameter: "1",
-					type: "string",
-					value: "hi",
-				},
-				{
-          key: "2",
-					parameter: "2",
-					type: "integer",
-					value: "2",
-				},{
-          key: "3",
-					parameter: "3",
-					type: "boolean",
-					value: "false",
-				}
-			]
+	 createTestCaseObject(testcase) {
+     let testcaseObject = {
+       name: testcase.testcaseName,
+       expectedResponseCode: testcase.testcaseInformation.expectedResponseCode,
+       requestType: testcase.testcaseInformation.requestType
+     }
 
-		}
+     testcaseObject.parameters = testcase.testcaseInformation.parameters;
+     testcaseObject.expectedValues = testcase.testcaseInformation.expectedValues;
 
-		return testcase;
-	}
+     return testcaseObject;
+   }
 
-	extractTestcasesFromTEF(endpoint) {
-    let tefTestcases = endpoint.testcases;
+	extractTestcasesFromTEF() {
+    let tefPath = this.state.current_endpoint.tefPath;
+    let tef = JSON.parse(fs.readFileSync(tefPath, 'utf8'));
+    let tefTestcases = tef.testcases;
     let testcases = [];
 
-    // for(let i = 0; i < j; i++) {
-      // testcases.push(this.createTestCaseObject(endpoint));
-    // }
+    tefTestcases.forEach(testcase => {
+      testcases.push(this.createTestCaseObject(testcase));
+    })
 
 		return testcases;
 	}
@@ -173,7 +134,7 @@ class ConnectedTestProjectViewer extends React.Component {
 
   renderEndpoint() {
     if(this.state.current_endpoint) {
-      return <Panel header="Endpoint Information" key="endpoint-info-panel">{this.renderEndpointData()}</Panel>
+      return <Panel header="Endpoint Information" style={endpointInfoPanelStyle} key="endpoint-info-panel">{this.renderEndpointData()}</Panel>
     }
   }
 
@@ -253,7 +214,7 @@ class ConnectedTestProjectViewer extends React.Component {
 
   renderTestCases() {
     if(this.state.current_endpoint) {
-      let testcases = this.extractTestcasesFromTEF(this.state.current_endpoint);
+      let testcases = this.extractTestcasesFromTEF();
       if(testcases) {
         return testcases.map((tc, index) => (<Testcase testcase={tc} uuid={tc.name.concat('_testcase_').concat(index)} key={tc.name.concat('_testcase_').concat(index)} />))
       }
@@ -261,6 +222,9 @@ class ConnectedTestProjectViewer extends React.Component {
   }
 
 	render() {
+    store.subscribe(() => {
+      console.log(store.getState());
+    });
     this.state.current_endpoint = this.props.endpoint;
     this.state.edit = this.props.edit;
 		return (
@@ -283,5 +247,10 @@ class ConnectedTestProjectViewer extends React.Component {
 }
 
 const TestProjectViewer = connect(mapStateToProps, mapDispatchToProps)(ConnectedTestProjectViewer);
+
+
+const endpointInfoPanelStyle = {
+  background: '#d3e4ff',
+};
 
 export default TestProjectViewer;

@@ -43,7 +43,6 @@ class ConnectedTestProjectDisplay extends React.Component {
 	}
 
 	componentDidMount() {
-		console.log(this.props.dir);
 		if(this.state.refreshid) {
 			clearInterval(refreshid);
 		}
