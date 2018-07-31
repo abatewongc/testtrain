@@ -7,7 +7,7 @@ import rootReducer from '../reducers';
 
 const history = createHashHistory();
 
-const configureStore = (initialState?: counterStateType) => {
+const configureStore = () => {
   // Redux Configuration
   const middleware = [];
   const enhancers = [];
@@ -48,7 +48,7 @@ const configureStore = (initialState?: counterStateType) => {
   const enhancer = composeEnhancers(...enhancers);
 
   // Create Store
-  const store = createStore(rootReducer, initialState, enhancer);
+  const store = createStore(rootReducer, enhancer);
 
   if (module.hot) {
     module.hot.accept(
@@ -60,4 +60,6 @@ const configureStore = (initialState?: counterStateType) => {
   return store;
 };
 
-export default { configureStore, history };
+const store = configureStore();
+
+export default { configureStore, history, store };

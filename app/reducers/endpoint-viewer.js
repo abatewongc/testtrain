@@ -1,4 +1,4 @@
-import { EPV_LOAD, EPV_CLEAR, EPV_EDIT } from "../constants/action-types";
+import { EPV_LOAD, EPV_CLEAR, EPV_EDIT, EPV_UPDATETESTCASES } from "../constants/action-types";
 
 const initialState = {
     current_endpoint: {},
@@ -24,6 +24,8 @@ const current_endpoint_reducer = (state = initialState, action) => {
         return { ...state, current_endpoint: emptyState.current_endpoint };
       case EPV_EDIT:
         return { ...state, edit_endpoint: action.payload };
+      case EPV_UPDATETESTCASES:
+        return { ...state, update_testcases: action.payload };
       default:
         return state;
     }
