@@ -7,6 +7,7 @@ import {
 	Button,
 	Form,
 	Modal,
+	Divider,
 } from 'antd';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
@@ -186,7 +187,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 				<Menu
 					theme={this.state.theme}
 					onClick={this.handleMenuClick}
-					style={{ width: 250 }}
+					style={{ width: 250, marginBottom: "0px" }}
 					onOpenChange={this.onOpenChange}
 					selectedKeys={[this.state.current]}
 					openKeys={this.state.openKeys}
@@ -196,6 +197,7 @@ class ConnectedTestProjectDisplay extends React.Component {
 					menudata.map(data => <ProjectMenuItem key={data.path} data={data} /> )
 				}
 				</Menu>
+				<Divider style={{margin: "4px", marginTop: "0px"}} />
 				<Button
 					type="default"
 					shape="circle"
@@ -243,7 +245,7 @@ const ProjectMenuItem = (props) =>
 	<SubMenu {...props} data={props.data} key={props.data.path} title={<span><Icon type="folder" /><span>{props.data.name}</span></span>}>
 	{
 		//Need to find a way to map to test directory better
-		props.data.children[0].children.map(ep => <Menu.Item data={ep} key={ep.name}>{ep.name.replace(new RegExp('&', 'g'), '/')}</Menu.Item>)
+		props.data.children[0].children.map(ep => <Menu.Item style={{marginBottom: "0px"}}data={ep} key={ep.name}>{ep.name.replace(new RegExp('&', 'g'), '/')}</Menu.Item>)
 	}
 	</SubMenu>
 

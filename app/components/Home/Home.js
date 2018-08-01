@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import SplitPane from 'react-split-pane';
-import FileTree from '../FileTreeComponent';
 import { Link } from 'react-router-dom';
 import styles from './Home.css';
-import { Menu, Icon, Switch } from 'antd';
+import { Menu, Icon, Switch, Layout, Divider } from 'antd';
+const { Header, Footer, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
 
 import TestProjectDisplay from '../TestProjectDisplay/TestProjectDisplay'
@@ -22,10 +22,14 @@ export default class Home extends Component<Props> {
 		return (
 			<div>
 				<div className={styles.container} data-tid="container">
-					<SplitPane split="vertical" defaultSize={250} minSize={250} maxSize={250}>
+					<Layout>
+						<Sider width={250} theme="light">
 						<div><TestProjectDisplay dir={directory}/></div>
+						</Sider>
+						<Content>
 						<div><TestProjectViewer/></div>
-					</SplitPane>
+						</Content>
+					</Layout>
 				</div>
 			</div>
 		);
