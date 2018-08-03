@@ -16,7 +16,7 @@ export default class CreateProjectModalWindow extends Component {
     this.state = {
 			endpoint: '',
       project: 'Please Select a Project',
-      testItems: [{ parameter: '', type: 'number'}],
+      testItems: [{ parameter: '', type: 'Number'}],
       successCode: '',
       failCode: ''
     };
@@ -78,7 +78,7 @@ export default class CreateProjectModalWindow extends Component {
     }
 
     this.setState({
-      testItems: this.state.testItems.concat([{ parameter: '', type: 'number'}])
+      testItems: this.state.testItems.concat([{ parameter: '', type: 'Number'}])
     });
   }
 

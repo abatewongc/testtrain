@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Divider, Button, Modal, Form, Row, Input, Col, Select, Radio } from 'antd';
+import { Divider, Button, Modal, Form, Row, Input, Col, Select, Radio, notification } from 'antd';
 import { connect } from "react-redux";
 import { loadEndpoint, clearEndpoint, editEndpoint, updateTestcases } from "../../actions/endpoint-viewer";
 import MenuBuilder from '../../menu.js';
@@ -44,8 +44,11 @@ class ConnectedEndpointViewer extends React.Component {
 					runnerVisible: false,
 					reportViewerVisible: false,
 					requestType: 'GET',
+					running: false,
+					generating: false,
 					testToRun: '',
 					testrunName: '',
+					autoname: false,
 					isArrayResponse: true,
 					saveResults: true,
 					showCode: false,
@@ -74,6 +77,8 @@ class ConnectedEndpointViewer extends React.Component {
 				this.handleReporterOptions = this.handleReporterOptions.bind(this);
 				this.submitTestcase = this.submitTestcase.bind(this);
 				this.runTest = this.runTest.bind(this);
+				this.disableTestrunName = this.disableTestrunName.bind(this);
+				this.setRunningState = this.setRunningState.bind(this);
 				this.onRequestTypeChange = this.onRequestTypeChange.bind(this);
 				this.onArrayResponseChange = this.onArrayResponseChange.bind(this);
 				this.onSaveResultsChange = this.onSaveResultsChange.bind(this);
@@ -173,6 +178,18 @@ class ConnectedEndpointViewer extends React.Component {
 			}
 			let tef = JSON.parse(fs.readFileSync(endpoint.tefPath, 'utf8'));
 			let testcases = tef.testcases;
+			let formFailure = false;
+
+			for(let i = 0; i < testcases.length; i++) {
+				let testcase = testcases[i];
+				if(testcase.testcaseName == formItems.testcaseName.value) {
+					 notification['error']({
+						 message: 'Form Validation Error',
+						 description: 'There is already a testcase with the name' + formItems.testcaseName.value
+					 });
+					 return;
+				}
+			}
 
 			//Create testcase JSON
 			let testcase = {
@@ -217,9 +234,13 @@ class ConnectedEndpointViewer extends React.Component {
 
 			store.set('testcases', testcases);
 
+			this.setState({generating: true});
+
 	    //Get root and remove everything
 	    let root = document.getElementById('generatorModalRoot');
-	    root.removeChild(root.children[0]);
+			while(root.firstChild) {
+				root.removeChild(root.firstChild);
+			}
 
 	    //Create spinner div to center
 	    let spinDiv = document.createElement('div');
@@ -244,7 +265,9 @@ class ConnectedEndpointViewer extends React.Component {
 			generateTestcases(endpoint, testcases);
 
 			this.props.updateTestcases(true);
+			this.props.updateTestcases(false); //Set to false after true to reset state
 			this.handleGeneratorCancel(false);
+			this.setState({generating: false});
 			this.forceUpdate();
 		}
 
@@ -260,6 +283,24 @@ class ConnectedEndpointViewer extends React.Component {
 	      cwd: projectDir
 	    }
 
+			if(this.state.testToRun == '') {
+				notification['error']({
+					'message': 'Form Validation Error',
+					'description': 'Please choose a test to run.'
+				});
+				return;
+			}
+
+			if(this.state.testrunName == '') {
+				if(!this.state.autorun && this.state.saveResults) {
+					notification['error']({
+						'message': 'Form Validation Error',
+						'description': 'Please put a testrun name or set reporter options to "Autoname Testrun"'
+					});
+					return;
+				}
+			}
+
 			let clArguments = ['node_modules/mocha/bin/mocha', '--recursive'];
 
 			if(this.state.saveResults) {
@@ -268,7 +309,10 @@ class ConnectedEndpointViewer extends React.Component {
 				if(this.state.reporterOptions.length > 0) {
 					clArguments.push('--reporter-options');
 
-					let reporterOptions = 'reportDir=' + testReportsDirectory + ',reportFileName=' + this.state.testrunName +',';
+					let reporterOptions = 'reportDir=' + testReportsDirectory + ',reportFilename=' + this.state.testrunName +',';
+					if(this.state.autoname) {
+						reporterOptions = 'reportDir=' + testReportsDirectory + ',reportFilename=' + this.state.testToRun +',';
+					}
 					this.state.reporterOptions.forEach(reporterOption => {
 						switch(reporterOption) {
 							case 'hideChart':
@@ -311,8 +355,13 @@ class ConnectedEndpointViewer extends React.Component {
 
 			let child = spawn('node', clArguments, options);
 
+			this.setState({running: true});
+
 	    //Get root and remove everything
 	    let root = document.getElementById('runnerModalRoot');
+			while(root.firstChild) {
+				root.removeChild(root.firstChild);
+			}
 
 	    //Create spinner div to center
 	    let spinDiv = document.createElement('div');
@@ -320,7 +369,7 @@ class ConnectedEndpointViewer extends React.Component {
 
 	    //Create loading spinner
 	    let spinner = document.createElement('div');
-	    spinner.className = 'ant-spin ant-spin-lg ant-spin-spinning';
+	    spinner.className = 'ant-spin ant-spin-spinning';
 
 	    //Creating the dots for the spinner
 	    let spinSpan = document.createElement('span');
@@ -335,9 +384,22 @@ class ConnectedEndpointViewer extends React.Component {
 	    root.appendChild(spinDiv);
 
 			let toggleRunnerModal = this.toggleRunnerModal;
+			let setRunningState = this.setRunningState;
+			if(this.state.autoname) {
+				this.setState({autoname: false});
+			}
 			child.on('close', function(code) {
 				toggleRunnerModal(false);
+				setRunningState(false);
 			});
+		}
+
+		setRunningState(value) {
+			this.setState({running: value});
+		}
+
+		setAutoname(value) {
+			this.setState({autoname: value});
 		}
 
 		onRequestTypeChange(value, option) {
@@ -347,7 +409,6 @@ class ConnectedEndpointViewer extends React.Component {
 
 		handleTestcaseSelection(value, option) {
 			let testToRun = option.props.value;
-			console.log(testToRun);
 			this.setState({testToRun: testToRun});
 		}
 
@@ -359,6 +420,14 @@ class ConnectedEndpointViewer extends React.Component {
 		}
 
 		handleReporterOptions(value) {
+			if(value.indexOf('autoname') > -1) {
+				this.setState({autoname: true});
+				this.setState({testrunName: ''});
+			} else {
+				if(this.state.autoname) {
+					this.setState({autoname: false});
+				}
+			}
 			this.setState({reporterOptions: value});
 		}
 
@@ -373,7 +442,7 @@ class ConnectedEndpointViewer extends React.Component {
 		generateClicked = (e) => {
 			this.setState({
 				generatorVisible: true,
-				expectedResponseProperties: [{parameter: '', type: 'number', value: ''}],
+				expectedResponseProperties: [{parameter: '', type: 'Number', value: ''}],
 				requestType: 'GET',
 				isArrayResponse: true
 			});
@@ -382,8 +451,9 @@ class ConnectedEndpointViewer extends React.Component {
 		runClicked = (e) => {
 			this.setState({
 				runnerVisible: true,
-				isArrayResponse: true,
-				testrunName: ''
+				testrunName: '',
+				testToRun: '',
+				autoname: false
 			});
 		}
 
@@ -412,6 +482,16 @@ class ConnectedEndpointViewer extends React.Component {
 
 				this.props.clearEndpoint({endpoint});
 
+		}
+
+		disableTestrunName() {
+			if(this.state.autoname) {
+				return true;
+			} else if(!this.state.saveResults) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 
 		uploadClicked = (e) => {
@@ -592,7 +672,7 @@ class ConnectedEndpointViewer extends React.Component {
 						<Row>
 							<Col span={24}>
 								<FormItem {...formItemLayout} label="Testrun Name" style={{marginRight: 6}}>
-									<Input id="testrunName" type="text" value={this.state.testrunName} onChange={this.handleChange} disabled={!this.state.saveResults}/>
+									<Input id="testrunName" type="text" value={this.state.testrunName} onChange={this.handleChange} disabled={this.disableTestrunName()}/>
 								</FormItem>
 							</Col>
 						</Row>
@@ -615,6 +695,7 @@ class ConnectedEndpointViewer extends React.Component {
 									<Option key="hideFailed" value="hideFailed">Hide Failed</Option>
 									<Option key="showSkipped" value="showSkipped">Show Skipped</Option>
 									<Option key="saveJson" value="saveJson">Save JSON</Option>
+									<Option key="autonName" value="autoname">Autoname Testrun</Option>
 								</Select>
 							</Col>
 						</Row>
@@ -719,9 +800,9 @@ class ConnectedEndpointViewer extends React.Component {
 													destroyOnClose={true}
 													width='80%'
 													footer={[
-														<Button key="addResponseProperty" onClick={this.handleAddResponseProperty}>Add Response Property</Button>,
-														<Button key="exitGenerator" onClick={this.handleGeneratorCancel}>Cancel</Button>,
-														<Button key="submitTestcase" onClick={this.submitTestcase}>Submit</Button>
+														<Button key="addResponseProperty" onClick={this.handleAddResponseProperty} disabled={this.state.generating}>Add Response Property</Button>,
+														<Button key="exitGenerator" onClick={this.handleGeneratorCancel} disabled={this.state.generating}>Cancel</Button>,
+														<Button key="submitTestcase" onClick={this.submitTestcase} disabled={this.state.generating}>Submit</Button>
 													]}
 												>
 													{this.renderGenerator(endpoint)}
@@ -742,8 +823,8 @@ class ConnectedEndpointViewer extends React.Component {
 												destroyOnClose={true}
 												width='60%'
 												footer={[
-													<Button key="exitRunner" onClick={this.handleRunnerCancel}>Cancel</Button>,
-													<Button key="run" onClick={this.runTest}>Run</Button>
+													<Button key="exitRunner" onClick={this.handleRunnerCancel} disabled={this.state.running}>Cancel</Button>,
+													<Button key="run" onClick={this.runTest} disabled={this.state.running}>Run</Button>
 												]}
 											>
 												{this.renderRunner(endpoint)}
