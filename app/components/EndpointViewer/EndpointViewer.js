@@ -869,8 +869,6 @@ class ConnectedEndpointViewer extends React.Component {
 		}
 }
 
-
-
 const EndpointViewer = connect(mapStateToProps, mapDispatchToProps)(ConnectedEndpointViewer);
 
 export default EndpointViewer;

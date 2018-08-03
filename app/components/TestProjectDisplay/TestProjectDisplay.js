@@ -23,6 +23,11 @@ import styles from './TestProjectDisplay.css';
 const remote = require('electron').remote;
 var rimraf = require('rimraf');
 
+const formItemLayout = {
+	labelCol: { span: 6 },
+	wrapperCol: { span: 18 }
+};
+
 const mapStateToProps = state => {
 	return {
 		endpoint: state.current_endpoint_reducer.current_endpoint.endpoint
@@ -34,6 +39,15 @@ const mapDispatchToProps = dispatch => {
 		loadEndpoint: endpoint => dispatch(loadEndpoint(endpoint)),
 	};
 };
+
+const ProjectMenuItem = (props) => {
+	<SubMenu {...props} data={props.data} key={props.data.path} title={<span><Icon type="folder" /><span>{props.data.name}</span></span>}>
+	{
+		//Need to find a way to map to test directory better
+		props.data.children[0].children.map(ep => <Menu.Item style={{marginBottom: "0px"}}data={ep} key={ep.name}>{ep.name.replace(new RegExp('&', 'g'), '/')}</Menu.Item>)
+	}
+	</SubMenu>
+}
 
 class ConnectedTestProjectDisplay extends React.Component {
 	constructor() {
@@ -240,20 +254,6 @@ class ConnectedTestProjectDisplay extends React.Component {
 		);
 	}
 }
-
-const ProjectMenuItem = (props) =>
-	<SubMenu {...props} data={props.data} key={props.data.path} title={<span><Icon type="folder" /><span>{props.data.name}</span></span>}>
-	{
-		//Need to find a way to map to test directory better
-		props.data.children[0].children.map(ep => <Menu.Item style={{marginBottom: "0px"}}data={ep} key={ep.name}>{ep.name.replace(new RegExp('&', 'g'), '/')}</Menu.Item>)
-	}
-	</SubMenu>
-
-const formItemLayout = {
-	labelCol: { span: 6 },
-	wrapperCol: { span: 18 }
-};
-
 
 const TestProjectDisplay = connect(mapStateToProps, mapDispatchToProps)(ConnectedTestProjectDisplay);
 

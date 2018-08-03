@@ -15,6 +15,10 @@ const fs = require('fs');
 
 import Testcase from '../Testcase/Testcase'
 
+const endpointInfoPanelStyle = {
+  background: '#d3e4ff',
+};
+
 const mapStateToProps = state => {
     return {
       endpoint: state.current_endpoint_reducer.current_endpoint.endpoint,
@@ -112,15 +116,15 @@ class ConnectedTestProjectViewer extends React.Component {
     let tefIndex = tefPath.indexOf(tefFile);
     let tefDirPath = tefPath.substring(0, tefIndex);
 
-    let store = new Store({
+    let _store = new Store({
       name: endpointName,
       cwd: tefDirPath,
       fileExtension: "tef"
     });
 
-    store.set('testItems', testItems);
-    store.set('successCode', successCode);
-    store.set('failCode', failCode);
+    _store.set('testItems', testItems);
+    _store.set('successCode', successCode);
+    _store.set('failCode', failCode);
 
     this.props.editEndpoint(false);
     this.forceUpdate();
@@ -222,9 +226,9 @@ class ConnectedTestProjectViewer extends React.Component {
   }
 
 	render() {
-    store.subscribe(() => {
+    /*store.subscribe(() => {
       console.log(store.getState());
-    });
+    });*/
     this.state.current_endpoint = this.props.endpoint;
     this.state.edit = this.props.edit;
 		return (
@@ -247,10 +251,5 @@ class ConnectedTestProjectViewer extends React.Component {
 }
 
 const TestProjectViewer = connect(mapStateToProps, mapDispatchToProps)(ConnectedTestProjectViewer);
-
-
-const endpointInfoPanelStyle = {
-  background: '#d3e4ff',
-};
 
 export default TestProjectViewer;

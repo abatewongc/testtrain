@@ -28,6 +28,45 @@ const mapDispatchToProps = dispatch => {
 	};
 };
 
+const columns = [{
+	title: 'Parameter',
+	dataIndex: 'parameter',
+	key: 'parameter',
+  }, {
+	title: 'Type',
+	dataIndex: 'type',
+	key: 'type',
+  }, {
+	title: 'Value',
+	dataIndex: 'value',
+	key: 'value',
+  }];
+
+const toolTipStyle = {
+	position: "absolute",
+	float: "right",
+}
+
+const buttonContainerStyle = {
+	textAlign: "right",
+}
+
+const dividerStyle = {
+	margin: "8px 8px 8px 4px",
+	padding: "0px 0px 0px 0px",
+}
+
+const buttonStyle = {
+	margin: "2px 2px 2px 2px",
+	padding: "0px 0px 0px 0px",
+}
+
+const style = {
+	padding: "4px 8px 4px 8px",
+	background: "#FFFFFF",
+}
+
+
 class ConnectedTestcase extends React.Component {
 	constructor(props) {
 		super(props);
@@ -91,7 +130,7 @@ class ConnectedTestcase extends React.Component {
 						  <Divider type='vertical'></Divider>
 						  <InputNumber min={1} max={1000} disabled={this.state.disabled} defaultValue={testcase.expectedResponseCode} />
 						  <Divider type='vertical'></Divider>
-						  <Divider style={dividerStyle} orientation="left" ></Divider>
+						  <Divider style={dividerStyle} orientation="left"></Divider>
 						  <Collapse bordered={false}>
 							<Panel header="Query Parameters">
 								{this.renderParameters(testcase)}
@@ -114,46 +153,6 @@ class ConnectedTestcase extends React.Component {
 	}
 
 }
-
-const columns = [{
-	title: 'Parameter',
-	dataIndex: 'parameter',
-	key: 'parameter',
-  }, {
-	title: 'Type',
-	dataIndex: 'type',
-	key: 'type',
-  }, {
-	title: 'Value',
-	dataIndex: 'value',
-	key: 'value',
-  }];
-
-const toolTipStyle = {
-	position: "absolute",
-	float: "right",
-}
-
-const buttonContainerStyle = {
-	textAlign: "right",
-}
-
-const dividerStyle = {
-	margin: "8px 8px 8px 4px",
-	padding: "0px 0px 0px 0px",
-}
-
-const buttonStyle = {
-	margin: "2px 2px 2px 2px",
-	padding: "0px 0px 0px 0px",
-}
-
-const style = {
-	padding: "4px 8px 4px 8px",
-	background: "#FFFFFF",
-}
-
-
 
 const Testcase = connect(mapStateToProps, mapDispatchToProps)(ConnectedTestcase);
 
