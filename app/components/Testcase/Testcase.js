@@ -41,16 +41,11 @@ class ConnectedTestcase extends React.Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.renderParameters = this.renderParameters.bind(this);
 		this.renderOutputs = this.renderOutputs.bind(this);
-		this.handleEditClicked = this.handleEditClicked.bind(this);
 		this.handleDeleteClicked = this.handleDeleteClicked.bind(this);
 	}
 
 	handleChange(value) {
 		console.log(`selected ${value}`);
-	}
-
-	handleEditClicked = (e) => {
-		console.log('edit ' + this.props.uuid + ' clicked');
 	}
 
 	handleDeleteClicked = (e) => {
@@ -109,7 +104,6 @@ class ConnectedTestcase extends React.Component {
 						</Content>
 						<Sider theme="light" width="36px" style={{ borderLeft: '1px solid #F1F2F6'  }}>
 						<div style={buttonContainerStyle}>
-							<Button style={buttonStyle} onClick={this.handleEditClicked} type="default" shape="circle" icon="sync" size="small" />
 							<Button style={buttonStyle} onClick={this.handleDeleteClicked} type="default" shape="circle" icon="delete" size="small" />
 						</div>
 						</Sider>

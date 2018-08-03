@@ -1,8 +1,8 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
-  "version": "0.13.3",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "name": "testtrain",
+  "productName": "TestTrain",
+  "version": "1.0.0",
+  "description": "TestTrain is an Electron application using  React, Redux, React Router, Webpack, React Transform HMR, and Ant Design for rapid development of both the front end and the back end of the application. This application was created using the [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate).",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.dll.js --colors",
@@ -40,8 +40,8 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.develar.ElectronReact",
+    "productName": "TestTrain",
+    "appId": "org.wit.TestTrain",
     "files": [
       "dist/",
       "node_modules/",
@@ -83,16 +83,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
+    "url": "git+https://github.com/abatewongc/testtrain.git"
   },
   "author": {
-    "name": "C. T. Lin",
-    "email": "chentsulin@gmail.com",
-    "url": "https://github.com/chentsulin"
+    "name": "Harrison Jue",
+    "email": "harrison.c.jue@gmail.com",
+    "url": "https://github.com/Harrison-Jue"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chentsulin/electron-react-boilerplate/issues"
+    "url": "https://github.com/abatewongc/testtrain/issues"
   },
   "keywords": [
     "electron",
@@ -105,7 +105,7 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/chentsulin/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/abatewongc/testtrain/blob/develop/README.md",
   "jest": {
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",

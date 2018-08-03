@@ -48,6 +48,9 @@ dll
 main.js
 main.js.map
 
+# IDEs
+.vscode
+
 .idea
 npm-debug.log.*
 
