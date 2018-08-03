@@ -70,6 +70,11 @@ export default class CreateProjectModalWindow extends Component {
       fs.mkdirSync(testPath);
     }
 
+    let reportPath = path.join(newDir, 'mochawesome-report');
+    if(!fs.existsSync(reportPath)) {
+      fs.mkdirSync(reportPath);
+}
+
     //Span NPM install child process into directory
     let args = ['install'];
     console.log(newDir);

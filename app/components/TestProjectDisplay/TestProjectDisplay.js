@@ -40,14 +40,13 @@ const mapDispatchToProps = dispatch => {
 	};
 };
 
-const ProjectMenuItem = (props) => {
-	<SubMenu {...props} data={props.data} key={props.data.path} title={<span><Icon type="folder" /><span>{props.data.name}</span></span>}>
+const ProjectMenuItem = (props) => <SubMenu {...props} data={props.data} key={props.data.path} title={<span><Icon type="folder" /><span>{props.data.name}</span></span>}>
 	{
 		//Need to find a way to map to test directory better
 		props.data.children[0].children.map(ep => <Menu.Item style={{marginBottom: "0px"}}data={ep} key={ep.name}>{ep.name.replace(new RegExp('&', 'g'), '/')}</Menu.Item>)
 	}
-	</SubMenu>
-}
+</SubMenu>
+
 
 class ConnectedTestProjectDisplay extends React.Component {
 	constructor() {
