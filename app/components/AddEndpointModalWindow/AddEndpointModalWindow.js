@@ -9,6 +9,7 @@ const dirTree = require('directory-tree');
 const remote = require('electron').remote;
 const FormItem = Form.Item;
 const Option = Select.Option;
+const fs = require('fs');
 
 export default class CreateProjectModalWindow extends Component {
   constructor() {
@@ -128,6 +129,8 @@ export default class CreateProjectModalWindow extends Component {
           let fileName = endpoint.replace(new RegExp('/', 'g'), '&');
           let tpfPath = path.join(project.path, project.name + '.tpf');
           let testPath = path.join(project.path, 'test', fileName);
+          let reportPath = path.join(project.path, 'mochawesome-report', fileName);
+          fs.mkdirSync(reportPath);
           let store = new Store({
             name: fileName,
             cwd: testPath,

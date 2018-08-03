@@ -114,4 +114,8 @@ app.on('ready', async () => {
     menuBuilder.createModalWindow(menuBuilder.createProject);
   });
 
+  mainWindow.on('add-new-endpoint', () => {
+    menuBuilder.createModalWindow(menuBuilder.addEndpoint);
+  });
+
 });

@@ -238,8 +238,8 @@ class ConnectedTestProjectViewer extends React.Component {
             {this.renderContent()}
 					</div>
 	      </Content>
-	      <Footer style={{ textAlign: 'center', height: '24px', zIndex: 1 }}>
-	        Something will go here, IDK, maybe remove
+	      <Footer style={{ textAlign: 'center', height: '4px', zIndex: 1, paddingTop: '4px', paddingBottom: '4px' }}>
+
 	      </Footer>
 	    </Layout>
     )
