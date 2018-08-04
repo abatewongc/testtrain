@@ -16,8 +16,8 @@ const ButtonGroup = Button.Group;
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const OptGroup = Select.OptGroup;
-var rimraf = require('rimraf');
 const remote = require('electron').remote;
+const rimraf = require('rimraf');
 
 const mapStateToProps = state => {
 		return {
@@ -178,6 +178,15 @@ class ConnectedEndpointViewer extends React.Component {
 			} else {
 				return;
 			}
+
+			if(!formItems.testcaseName.value) {
+				notification['error']({
+					message: 'Form validation Error',
+					description: 'Please input a testcase name'
+				});
+				return;
+			}
+
 			let tef = JSON.parse(fs.readFileSync(endpoint.tefPath, 'utf8'));
 			let testcases = tef.testcases;
 			let formFailure = false;
@@ -211,7 +220,7 @@ class ConnectedEndpointViewer extends React.Component {
 			for(let i = 0; i < formItems.length; i++) {
 				let id = formItems[i].id;
 				let value = formItems[i].value;
-				if(id != 'testcaseName' && id != 'expectedResponseCode' && id && value) {
+				if(id && id != 'testcaseName' && id != 'expectedResponseCode'&& value) {
 					let parameter = {};
 					tef.testItems.forEach(testItem => {
 						if(testItem.parameter == id) {
@@ -267,7 +276,7 @@ class ConnectedEndpointViewer extends React.Component {
 			generateTestcases(endpoint, testcases);
 
 			this.props.updateTestcases(true);
-			this.props.updateTestcases(false); //Set to false after true to reset state
+			this.props.updateTestcases(false);
 			this.handleGeneratorCancel(false);
 			this.setState({generating: false});
 			this.forceUpdate();
@@ -282,7 +291,9 @@ class ConnectedEndpointViewer extends React.Component {
 	    let projectDir = path.join(homeDir, endpoint.projectName);
 			let testReportsDirectory = path.join(projectDir, 'mochawesome-report', endpoint.name);
 	    let options = {
-	      cwd: projectDir
+	      cwd: projectDir,
+				stdio: 'pipe',
+				endcoding: 'utf-8'
 	    }
 
 			if(this.state.testToRun == '') {
@@ -355,7 +366,17 @@ class ConnectedEndpointViewer extends React.Component {
 				clArguments.push('--grep', this.state.testToRun);
 			}
 
+			let result = '';
+			let error = '';
 			let child = spawn('node', clArguments, options);
+
+			child.stdout.on('data', function(data) {
+				result += data.toString();
+			})
+
+			child.stderr.on('data', function(data) {
+				error += data.toString();
+			})
 
 			this.setState({running: true});
 
@@ -390,7 +411,24 @@ class ConnectedEndpointViewer extends React.Component {
 			if(this.state.autoname) {
 				this.setState({autoname: false});
 			}
+
+
 			child.on('close', function(code) {
+				if(result) {
+					notification['success']({
+						message: 'Finished Running Tests',
+						description: result,
+						duration: 0
+					})
+				} else {
+					notification['error']({
+						message: 'Run Error',
+						description: 'A testcase has caused the test runner to stop running, check your testcase expected values parameters to see if their types are correct.',
+						duration: 0
+					})
+				}
+				console.log(result);
+				console.log(error);
 				toggleRunnerModal(false);
 				setRunningState(false);
 			});

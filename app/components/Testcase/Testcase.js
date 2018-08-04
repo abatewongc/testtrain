@@ -12,19 +12,23 @@ import { Icon,
 			Table,
 			InputNumber
  } from 'antd';
+import { updateTestcases } from "../../actions/endpoint-viewer";
+const Store = require('electron-store');
+const fs = require('fs');
+const generateTestcases = require('../EndpointViewer/TestcaseGenerator');
 const { Header, Content, Footer, Sider } = Layout;
 const Panel = Collapse.Panel;
 const Option = Select.Option;
 
 const mapStateToProps = state => {
 	return {
-
+		endpoint: state.current_endpoint_reducer.current_endpoint.endpoint
 	};
 };
 
 const mapDispatchToProps = dispatch => {
 	return {
-
+		updateTestcases: update => dispatch(updateTestcases(update))
 	};
 };
 
@@ -87,6 +91,32 @@ class ConnectedTestcase extends React.Component {
 	}
 
 	handleDeleteClicked = (e) => {
+		let testcase = this.props.testcase;
+		let endpoint = this.props.endpoint;
+
+    let tefPath = endpoint.tefPath;
+    let tef = JSON.parse(fs.readFileSync(tefPath, 'utf8'));
+    let tefTestcases = tef.testcases;
+
+		let storeCwd = endpoint.tefPath.substring(0, endpoint.tefPath.indexOf(endpoint.name + '.tef') - 1);
+		let store = new Store({
+			name: endpoint.name,
+			cwd: storeCwd,
+			fileExtension: "tef"
+		});
+
+		for(let i = 0; i < tefTestcases.length; i++) {
+			let tefTestcase = tefTestcases[i];
+			if(tefTestcase.testcaseName == testcase.name) {
+				tefTestcases.splice(i, 1);
+				break;
+			}
+		}
+
+		store.set('testcases', tefTestcases);
+		generateTestcases(endpoint, tefTestcases);
+		this.props.updateTestcases(true);
+		this.props.updateTestcases(false);
 	}
 
 	renderParameters(testcase) {

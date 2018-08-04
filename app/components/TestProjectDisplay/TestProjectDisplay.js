@@ -131,10 +131,35 @@ class ConnectedTestProjectDisplay extends React.Component {
 			return;
 		}
 
+    let root = document.getElementById('deleteProjectModalRoot');
+		while(root.firstChild) {
+			root.removeChild(root.firstChild);
+		}
+
+    //Create spinner div to center
+    let spinDiv = document.createElement('div');
+    spinDiv.className = styles.center;
+
+    //Create loading spinner
+    let spinner = document.createElement('div');
+    spinner.className = 'ant-spin ant-spin-lg ant-spin-spinning';
+
+    //Creating the dots for the spinner
+    let spinSpan = document.createElement('span');
+    spinSpan.className = 'ant-spin-dot ant-spin-dot-spin';
+    for(let i = 0; i < 4; i++) {
+      spinSpan.appendChild(document.createElement('i'));
+    }
+
+    //Append loading spinner to root
+    spinner.appendChild(spinSpan);
+    spinDiv.appendChild(spinner);
+    root.appendChild(spinDiv);
+
 		try {
 			rimraf.sync(projectToDelete);
 		} catch(error) {
-			// ignore this cuz im lazy and this isn't an enterprise app
+			console.log(error)
 		}
 
 		this.setState({projectDeleteModalVisible: false});
@@ -234,18 +259,20 @@ class ConnectedTestProjectDisplay extends React.Component {
 					onOk={this.handleDeleteProject}
 					onCancel={this.handleDeleteProjectCancel}
 				>
-					<FormItem {...formItemLayout} label="Select Project">
-						<Select id="deleteProjectModalSelect"
-							style={{
-								width: '60%'
-							}}
-							onChange={this.handleDeleteProjectModalSelection}
-						>
-								{
-									tempMenuData.map((data) => <Option key={data.path} value={data.path}>{data.name}</Option>)
-								}
-						</Select>
-					</FormItem>
+					<div id="deleteProjectModalRoot">
+						<FormItem {...formItemLayout} label="Select Project">
+							<Select id="deleteProjectModalSelect"
+								style={{
+									width: '60%'
+								}}
+								onChange={this.handleDeleteProjectModalSelection}
+							>
+									{
+										tempMenuData.map((data) => <Option key={data.path} value={data.path}>{data.name}</Option>)
+									}
+							</Select>
+						</FormItem>
+					</div>
 				</Modal>
 			</div>
 		);

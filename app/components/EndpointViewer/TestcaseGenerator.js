@@ -99,6 +99,7 @@ const generateQuery = function(parameters) {
 }
 
 const generateRequestTestcases = function(requestTests, endpoint, type, server) {
+	let testEndpointName = endpoint.name.replace(new RegExp('&', 'g'), '/');
 	let testcaseStrings = '';
 	for(let i = 0; i < requestTests.length; i++) {
 		let testcase = requestTests[i];
@@ -123,44 +124,83 @@ const generateRequestTestcases = function(requestTests, endpoint, type, server) 
 			let parameter = expectedValues[j].parameter;
 			let type = expectedValues[j].type;
 			let value = expectedValues[j].value;
-			let propStringSingle = `						res.body.should.have.property('%s').that.equal('%s')%s`;
-			let propOtherSingle = `						res.body.should.have.property('%s').that.equal(%s)%s`;
-			let propStringMulti = `							o.should.have.property('%s').that.equal('%s')%s`;
-			let propOtherMulti = `							o.should.have.property('%s').that.equal(%s)%s`;
 
-			let newLineParams = '\n';
-			if(i == expectedValues.length - 1) {
-				newLineParams = '';
+			let propStringSingle = `						res.body.should.have.property('%s')%s`;
+			let propOtherSingle = `						res.body.should.have.property('%s')%s`;
+			let propStringMulti = `							o.should.have.property('%s')%s`;
+			let propOtherMulti = `							o.should.have.property('%s')%s`;
+			if(parameter.indexOf('.') != -1) {
+				propStringSingle = `						res.body.should.have.nested.property('%s')%s`;
+				propOtherSingle = `						res.body.should.have.nested.property('%s')%s`;
+				propStringMulti = `							o.should.have.nested.property('%s')%s`;
+				propOtherMulti = `							o.should.have.nested.property('%s')%s`;
+			}
+			if(value) {
+				propStringSingle = util.format(propStringSingle, '%s', `.that.equal('%s')%s`);
+				propOtherSingle = util.format(propOtherSingle, '%s', `.that.equal(%s)%s`);
+				propStringMulti = util.format(propStringMulti, '%s', `.that.equal('%s')%s`);
+				propOtherMulti = util.format(propOtherMulti, '%s', `.that.equal(%s)%s`);
+			}
+
+			let newLineParams = ';\n';
+			if(j == expectedValues.length - 1) {
+				newLineParams = ';';
 			}
 
 			if(type == 'String') {
 				if(isArray) {
-					valueChecks += util.format(propStringMulti, parameter, value, newLineParams);
+					if(value) {
+						valueChecks += util.format(propStringMulti, parameter, value, newLineParams);
+					} else {
+						valueChecks += util.format(propStringMulti, parameter, newLineParams);
+					}
 				} else {
-					valueChecks += util.format(propStringSingle, parameter, value, newLineParams);
+					if(value) {
+						valueChecks += util.format(propStringSingle, parameter, value, newLineParams);
+					}
+					else {
+						valueChecks += util.format(propStringSingle, parameter, newLineParams);
+					}
 				}
 			} else {
 				if(isArray) {
-					valueChecks += util.format(propOtherMulti, parameter, value, newLineParams);
+					if(value) {
+						valueChecks += util.format(propOtherMulti, parameter, value, newLineParams);
+					} else {
+						valueChecks += util.format(propOtherMulti, parameter, newLineParams);
+					}
 				} else {
-					valueChecks += util.format(propOtherSingle, parameter, value, newLineParams);
+					if(value) {
+						valueChecks += util.format(propOtherSingle, parameter, value, newLineParams);
+					} else {
+						valueChecks += util.format(propOtherSingle, parameter, newLineParams);
+					}
 				}
 			}
 		}
 
 		let fullAssertion = util.format(assertObjectType, valueChecks);
-		let tL = util.format(testLayer, testcaseName, type.toLowerCase(), endpoint.name, query, endpoint.name, expectedResponseCode, fullAssertion);
+		let endpointQuery = testEndpointName + '?';
+		let params = testcase.testcaseInformation.parameters;
+		for(let i = 0; i < params.length; i++) {
+			let param = params[i];
+			if(i > 0) {
+				endpointQuery += '&'
+			}
+			endpointQuery += param.parameter + '=' + param.value;
+		}
+		let tL = util.format(testLayer, testcaseName, type.toLowerCase(), testEndpointName, query, endpointQuery, expectedResponseCode, fullAssertion);
 		if(isArray) {
 			if(valueChecks) {
 				let arrayCheck = util.format(assertObjectType, util.format(checkArray, '\n' + valueChecks));
-				tL = util.format(testLayer, testcaseName, type.toLowerCase(), endpoint.name, query, endpoint.name, expectedResponseCode, arrayCheck);
+				tL = util.format(testLayer, testcaseName, type.toLowerCase(), testEndpointName, query, endpointQuery, expectedResponseCode, arrayCheck);
 			}
 		}
 		testcaseStrings += tL;
 	}
-	let eRL = util.format(endpointRequestLayer, type + ' ' + endpoint.name, testcaseStrings);
+	let eRL = util.format(endpointRequestLayer, type + ' ' + testEndpointName, testcaseStrings);
 	let rL = util.format(requestLayer, type, eRL);
-	let eL = util.format(endpointLayer, endpoint.name, rL);
+	let eL = util.format(endpointLayer, testEndpointName, rL);
 
 	return util.format(imports, server, eL);
 }
