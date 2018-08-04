@@ -285,13 +285,6 @@ export default class MenuBuilder {
                       !this.mainWindow.isFullScreen()
                     );
                   }
-                },
-                {
-                  label: 'Toggle &Developer Tools',
-                  accelerator: 'Alt+Ctrl+I',
-                  click: () => {
-                    this.mainWindow.toggleDevTools();
-                  }
                 }
               ]
       }

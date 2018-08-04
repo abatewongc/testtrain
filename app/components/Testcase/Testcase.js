@@ -84,11 +84,9 @@ class ConnectedTestcase extends React.Component {
 	}
 
 	handleChange(value) {
-		console.log(`selected ${value}`);
 	}
 
 	handleDeleteClicked = (e) => {
-		console.log('delete ' + this.props.uuid + ' clicked');
 	}
 
 	renderParameters(testcase) {

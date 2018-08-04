@@ -77,7 +77,6 @@ export default class CreateProjectModalWindow extends Component {
 
     //Span NPM install child process into directory
     let args = ['install'];
-    console.log(newDir);
     let options = {
       cwd: newDir
     }

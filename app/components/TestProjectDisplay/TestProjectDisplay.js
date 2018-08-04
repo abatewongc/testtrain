@@ -115,8 +115,6 @@ class ConnectedTestProjectDisplay extends React.Component {
   }
 
 	handleAddButtonClick = (e) => {
-		console.log(e);
-		console.log("add button clicked");
 		let browserWindow = remote.getCurrentWindow()
 		browserWindow.emit('add-new-project');
 	}

@@ -46,6 +46,8 @@
       "dist/",
       "node_modules/",
       "app.html",
+      "add-endpoint-modal-window.html",
+      "create-project-modal-window.html",
       "main.prod.js",
       "main.prod.js.map",
       "package.json"

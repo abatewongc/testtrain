@@ -226,9 +226,6 @@ class ConnectedTestProjectViewer extends React.Component {
   }
 
 	render() {
-    /*store.subscribe(() => {
-      console.log(store.getState());
-    });*/
     this.state.current_endpoint = this.props.endpoint;
     this.state.edit = this.props.edit;
 		return (

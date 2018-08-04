@@ -294,7 +294,7 @@ class ConnectedEndpointViewer extends React.Component {
 			}
 
 			if(this.state.testrunName == '') {
-				if(!this.state.autorun && this.state.saveResults) {
+				if(!this.state.autoname && this.state.saveResults) {
 					notification['error']({
 						'message': 'Form Validation Error',
 						'description': 'Please put a testrun name or set reporter options to "Autoname Testrun"'

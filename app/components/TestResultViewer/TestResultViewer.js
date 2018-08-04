@@ -57,8 +57,6 @@ class ConnectedTestResultViewer extends React.Component {
                 fullpath: paths.join(reportPath, element),
             })
         });
-
-        console.log(reports);
         if(reports.length > 0) {
             this.setState({ reportIsLoaded: true })
         }
