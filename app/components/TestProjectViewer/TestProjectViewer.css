@@ -1,0 +1,18 @@
+.container {
+  margin: 6px 6px 6px 6px;
+  text-align: left;
+}
+
+.label {
+  margin: 6px 6px 6px 6px;
+  width: 15%;
+}
+
+.inputBox {
+  width: 15%;
+}
+
+.submit {
+  float: right;
+  margin: 6px 6px 6px 6px;
+}
