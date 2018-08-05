@@ -6,11 +6,11 @@
 [![Webpack](/internals/img/webpack-padded-90.png)](https://webpack.github.io/)
 [![Redux](/internals/img/redux-padded-90.png)](http://redux.js.org/)
 [![React Router](/internals/img/react-router-padded-90.png)](https://github.com/ReactTraining/react-router)
-[![Flow](/internals/img/flow-padded-90.png)](https://flowtype.org/)
 [![ESLint](/internals/img/eslint-padded-90.png)](http://eslint.org/)
-[![Jest](/internals/img/jest-padded-90.png)](https://facebook.github.io/jest/)
 [![Yarn](/internals/img/yarn-padded-90.png)](https://yarnpkg.com/)
-[![Ant Design](https://bang.gallerycdn.vsassets.io/extensions/bang/antd-snippets/0.0.8/1504075239450/Microsoft.VisualStudio.Services.Icons.Default)](https://ant.design/)
+[![Ant Design](/internals/img/antd-padded-90.png)](https://ant.design/)
+[![Mocha](/internals/img/mocha-padded-90.png)](https://mochajs.org/)
+[![Chai](/internals/img/chai-padded-90.png)](http://www.chaijs.com/)
 
 ## About TestTrain
 
