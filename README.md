@@ -2,13 +2,21 @@
 ## An Integration Testing Test Suite Application
 <br/>
 [![React](https://github.com/abatewongc/testtrain/blob/master/internals/img/react-padded-90.png)](https://facebook.github.io/react/)
+
 [![Webpack](https://github.com/abatewongc/testtrain/blob/master/internals/img/webpack-padded-90.png)](https://webpack.github.io/)
+
 [![Redux](https://github.com/abatewongc/testtrain/blob/master/internals/img/redux-padded-90.png)](http://redux.js.org/)
+
 [![React Router](https://github.com/abatewongc/testtrain/blob/master/internals/img/react-router-padded-90.png)](https://github.com/ReactTraining/react-router)
+
 [![Flow](https://github.com/abatewongc/testtrain/blob/master/internals/img/flow-padded-90.png)](https://flowtype.org/)
+
 [![ESLint](https://github.com/abatewongc/testtrain/blob/master/internals/img/eslint-padded-90.png)](http://eslint.org/)
+
 [![Jest](https://github.com/abatewongc/testtrain/blob/master/internals/img/jest-padded-90.png)](https://facebook.github.io/jest/)
+
 [![Yarn](https://github.com/abatewongc/testtrain/blob/master/internals/img/yarn-padded-90.png)](https://yarnpkg.com/)
+
 [![Ant Design](https://bang.gallerycdn.vsassets.io/extensions/bang/antd-snippets/0.0.8/1504075239450/Microsoft.VisualStudio.Services.Icons.Default)](https://ant.design/)
 
 ## About TestTrain
