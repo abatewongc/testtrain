@@ -220,7 +220,6 @@ export default class CreateProjectModalWindow extends Component {
         <Row style={{marginBottom: 8}}>
           <Button type="primary" htmlType="submit" onClick={this.handleSubmit} className={styles.button}>Submit</Button>
           <Button onClick={this.handleAddTestItem} className={styles.button}>Add Parameter</Button>
-          <Button onClick={this.test} className={styles.button}>Test</Button>
         </Row>
 			</Form>
     );
