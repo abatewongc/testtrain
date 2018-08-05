@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Divider, Button, Modal, Form, Row, Input, Col, Select, Radio, notification } from 'antd';
+import { Divider, Button, Modal, Form, Row, Input, Col, Select, Radio, notification, Tooltip } from 'antd';
 import { connect } from "react-redux";
 import { loadEndpoint, clearEndpoint, editEndpoint, updateTestcases } from "../../actions/endpoint-viewer";
 import MenuBuilder from '../../menu.js';
@@ -898,7 +898,13 @@ class ConnectedEndpointViewer extends React.Component {
 											>
 													<TestResultViewer endpoint={endpoint} />
 											</Modal>
+											<Tooltip
+												title="Feature coming in future update!"
+												mouseEnterDelay="0.2"
+												placement="topRight"
+											>
 											<Button size="small" onClick={this.uploadClicked} disabled="true">Upload</Button>
+											</Tooltip>
 									</ButtonGroup>
 									</div>
 							</div>
