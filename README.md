@@ -16,9 +16,9 @@
 
 TestTrain is an [Electron](http://electron.atom.io/) application using  [React](https://facebook.github.io/react/), [Redux](https://github.com/reactjs/redux), [React Router](https://github.com/reactjs/react-router), [Webpack](http://webpack.github.io/docs/), [React Transform HMR](https://github.com/gaearon/react-transform-hmr), and [Ant Design](https://ant.design/) for rapid development of both the front end and the back end of the application. This application was created using the [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate).
 
-TestTrain is designed to look and feel like an IDE but without the need for actual coding.
+TestTrain is designed to look and feel like an IDE but without the need for actual coding. TestTrain's UI is split between two panels, the left side panel for projects along with their endpoints, and a right side panel which shows endpoint information and allows users to interact with the endpoint.
 
-TestTrain's UI is split between two panels, the left side panel for projects along with their endpoints, and a right side panel which shows endpoint information and allows users to interact with the endpoint.
+TestTrain builds automated test code based on user input, then runs the tests using the mocha testing framework along with the Chai/Chai-HTTP assertion libraries. HTML test reports are built via mochawesome and are viewable in any web browser.
 
 ## Requirements
 
