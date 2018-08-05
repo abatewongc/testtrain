@@ -18,11 +18,11 @@ TestTrain is an [Electron](http://electron.atom.io/) application using  [React](
 
 TestTrain is designed to look and feel like an IDE but without the need for actual coding.
 
-TestTrain's UI is split between two panels, the left side panel for projects along with their endpoints, and the right side panel that shows endpoint information and allows users to interact with the endpoint.
+TestTrain's UI is split between two panels, the left side panel for projects along with their endpoints, and a right side panel which shows endpoint information and allows users to interact with the endpoint.
 
 ## Requirements
 
-To use or develop TestTrain, you must have [node.js](https://nodejs.org/en/) along with its package manager npm must be installed.
+To use or develop TestTrain, you must have [node.js](https://nodejs.org/en/) along with its package manager npm.
 
 ## For Use
 
